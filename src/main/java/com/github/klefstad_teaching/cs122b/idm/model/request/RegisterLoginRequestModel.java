@@ -1,6 +1,6 @@
 package com.github.klefstad_teaching.cs122b.idm.model.request;
 
-public class RegisterRequestModel {
+public class RegisterLoginRequestModel {
     String email;
     char[] password;
 
@@ -8,7 +8,7 @@ public class RegisterRequestModel {
         return email;
     }
 
-    public RegisterRequestModel setEmail(String email) {
+    public RegisterLoginRequestModel setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -17,7 +17,7 @@ public class RegisterRequestModel {
         return password;
     }
 
-    public RegisterRequestModel setPassword(char[] password) {
+    public RegisterLoginRequestModel setPassword(char[] password) {
         this.password = password;
         return this;
     }

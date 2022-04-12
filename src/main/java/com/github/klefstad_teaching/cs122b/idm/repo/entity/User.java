@@ -2,15 +2,9 @@ package com.github.klefstad_teaching.cs122b.idm.repo.entity;
 
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.Role;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.UserStatus;
-import org.springframework.jdbc.core.RowMapper;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class User
 {

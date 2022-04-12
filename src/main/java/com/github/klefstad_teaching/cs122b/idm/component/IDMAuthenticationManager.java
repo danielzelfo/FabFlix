@@ -1,5 +1,7 @@
 package com.github.klefstad_teaching.cs122b.idm.component;
 
+import com.github.klefstad_teaching.cs122b.core.error.ResultError;
+import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.repo.IDMRepo;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
@@ -15,6 +17,8 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Base64;
 import java.util.List;
@@ -66,7 +70,7 @@ public class IDMAuthenticationManager
         return salt;
     }
 
-    public User selectAndAuthenticateUser(String email, char[] password)
+    public User selectAndAuthenticateUser(String email, char[] password) throws ResultError
     {
         String sql =
                 "SELECT id, email, user_status_id, salt, hashed_password " +
@@ -93,14 +97,14 @@ public class IDMAuthenticationManager
                 );
 
         if (users.size() == 0)
-            return null;
+            throw new ResultError(IDMResults.USER_NOT_FOUND);
 
         User user = users.get(0);
 
         String givedPasswordHashed = Base64.getEncoder().encodeToString(hashPassword(password, Base64.getDecoder().decode(user.getSalt())));
 
         if (!givedPasswordHashed.equals(user.getHashedPassword()))
-            return null;
+            throw new ResultError(IDMResults.INVALID_CREDENTIALS);
 
         return user;
     }
@@ -110,8 +114,6 @@ public class IDMAuthenticationManager
 
         byte[] salt = genSalt();
         byte[] passwordHashed = hashPassword(password, salt);
-
-        System.out.println(salt.length);
 
         String sql =
                 "INSERT INTO idm.user (email, user_status_id, salt, hashed_password)" +
@@ -132,6 +134,20 @@ public class IDMAuthenticationManager
 
     public void insertRefreshToken(RefreshToken refreshToken)
     {
+        String sql =
+                "INSERT INTO idm.refresh_token (token, user_id, token_status_id, expire_time, max_life_time)" +
+                        "VALUES (:token, :user_id, :token_status_id, :expire_time, :max_life_time);";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("token", refreshToken.getToken(), Types.NCHAR)
+                        .addValue("user_id", refreshToken.getUserId(), Types.INTEGER)
+                        .addValue("token_status_id", refreshToken.getTokenStatus().id(), Types.INTEGER)
+                        .addValue("expire_time", Timestamp.from(refreshToken.getExpireTime()), Types.TIMESTAMP)
+                        .addValue("max_life_time", Timestamp.from(refreshToken.getMaxLifeTime()), Types.TIMESTAMP);
+
+        repo.getJdbcTemplate().update(sql, source);
+
     }
 
     public RefreshToken verifyRefreshToken(String token)

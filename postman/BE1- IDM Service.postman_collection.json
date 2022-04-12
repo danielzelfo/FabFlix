@@ -20,10 +20,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/register",
+					"raw": "http://akera.ddns.net:8081/register",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"akera.ddns.net"
 					],
 					"port": "8081",
 					"path": [
@@ -48,10 +48,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/login",
+					"raw": "http://akera.ddns.net:8081/login",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"akera.ddns.net"
 					],
 					"port": "8081",
 					"path": [
@@ -76,10 +76,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/refresh",
+					"raw": "http://akera.ddns.net:8081/refresh",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"akera.ddns.net"
 					],
 					"port": "8081",
 					"path": [
@@ -104,10 +104,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8081/authenticate",
+					"raw": "http://akera.ddns.net:8081/authenticate",
 					"protocol": "http",
 					"host": [
-						"localhost"
+						"akera.ddns.net"
 					],
 					"port": "8081",
 					"path": [
