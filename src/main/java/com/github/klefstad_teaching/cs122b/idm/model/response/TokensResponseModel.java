@@ -1,8 +1,6 @@
 package com.github.klefstad_teaching.cs122b.idm.model.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-public class LoginResponseModel extends BasicResponseModel {
+public class TokensResponseModel extends BasicResponseModel {
     private String accessToken;
     private String refreshToken;
 
@@ -10,7 +8,7 @@ public class LoginResponseModel extends BasicResponseModel {
         return accessToken;
     }
 
-    public LoginResponseModel setAccessToken(String accessToken) {
+    public TokensResponseModel setAccessToken(String accessToken) {
         this.accessToken = accessToken;
         return this;
     }
@@ -19,7 +17,7 @@ public class LoginResponseModel extends BasicResponseModel {
         return refreshToken;
     }
 
-    public LoginResponseModel setRefreshToken(String refreshToken) {
+    public TokensResponseModel setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         return this;
     }

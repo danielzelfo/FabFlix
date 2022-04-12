@@ -4,9 +4,9 @@ import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMAuthenticationManager;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMJwtManager;
-import com.github.klefstad_teaching.cs122b.idm.model.request.RegisterLoginRequestModel;
+import com.github.klefstad_teaching.cs122b.idm.model.request.CredentialsRequestModel;
 import com.github.klefstad_teaching.cs122b.idm.model.response.BasicResponseModel;
-import com.github.klefstad_teaching.cs122b.idm.model.response.LoginResponseModel;
+import com.github.klefstad_teaching.cs122b.idm.model.response.TokensResponseModel;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.UserStatus;
@@ -37,7 +37,7 @@ public class RegisterLoginController
     }
 
 
-    private void validateRequestCredentials(RegisterLoginRequestModel request) throws ResultError {
+    private void validateRequestCredentials(CredentialsRequestModel request) throws ResultError {
         if (!validate.passwordMeetsLengthRequirement(request.getPassword())) {
             throw new ResultError(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS);
         }
@@ -56,7 +56,7 @@ public class RegisterLoginController
     }
 
     @PostMapping("/register")
-    public ResponseEntity<BasicResponseModel> register(@RequestBody RegisterLoginRequestModel request) {
+    public ResponseEntity<BasicResponseModel> register(@RequestBody CredentialsRequestModel request) {
         try {
             validateRequestCredentials(request);
         } catch( ResultError exception ) {
@@ -76,7 +76,7 @@ public class RegisterLoginController
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseModel> login(@RequestBody RegisterLoginRequestModel request) {
+    public ResponseEntity<TokensResponseModel> login(@RequestBody CredentialsRequestModel request) {
         User user;
 
         try {
@@ -100,11 +100,11 @@ public class RegisterLoginController
 
         authManager.insertRefreshToken( refreshToken );
 
-        LoginResponseModel loginResponseModel = new LoginResponseModel();
-        loginResponseModel.setResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY);
+        TokensResponseModel tokensResponseModel = new TokensResponseModel();
+        tokensResponseModel.setResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(loginResponseModel
+                .body(tokensResponseModel
                         .setAccessToken(accessToken)
                         .setRefreshToken(refreshToken.getToken())
                 );

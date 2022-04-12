@@ -101,7 +101,7 @@ public class IDMAuthenticationManager
 
         User user = users.get(0);
 
-        String givedPasswordHashed = Base64.getEncoder().encodeToString(hashPassword(password, Base64.getDecoder().decode(user.getSalt())));
+        String givedPasswordHashed = Base64.getEncoder().encodeToString(hashPassword(password, user.getSalt()));
 
         if (!givedPasswordHashed.equals(user.getHashedPassword()))
             throw new ResultError(IDMResults.INVALID_CREDENTIALS);

@@ -76,8 +76,10 @@ public class IDMJwtManager
         }
     }
 
-    public void verifyAccessToken(String jws) throws ParseException, BadJOSEException, JOSEException {
-        verifyJWT(SignedJWT.parse(jws));
+    public SignedJWT verifiedSignedJWT(String jws) throws ParseException, BadJOSEException, JOSEException {
+        SignedJWT signedJWT = SignedJWT.parse(jws);
+        verifyJWT(signedJWT);
+        return signedJWT;
     }
 
     public RefreshToken buildRefreshToken(User user)
