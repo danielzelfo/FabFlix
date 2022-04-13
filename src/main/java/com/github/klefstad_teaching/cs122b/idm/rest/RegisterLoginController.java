@@ -57,11 +57,9 @@ public class RegisterLoginController
 
     @PostMapping("/register")
     public ResponseEntity<BasicResponseModel> register(@RequestBody CredentialsRequestModel request) {
-        try {
-            validateRequestCredentials(request);
-        } catch( ResultError exception ) {
-            throw exception;
-        }
+
+        validateRequestCredentials(request);
+
 
         try {
             authManager.createAndInsertUser(request.getEmail(), request.getPassword());
@@ -79,12 +77,9 @@ public class RegisterLoginController
     public ResponseEntity<TokensResponseModel> login(@RequestBody CredentialsRequestModel request) {
         User user;
 
-        try {
-            validateRequestCredentials(request);
-            user = authManager.selectAndAuthenticateUser(request.getEmail(), request.getPassword());
-        } catch (ResultError exception) {
-            throw exception;
-        }
+        validateRequestCredentials(request);
+        user = authManager.selectAndAuthenticateUser(request.getEmail(), request.getPassword());
+
 
         if (user.getUserStatus().equals(UserStatus.LOCKED)) {
             throw new ResultError(IDMResults.USER_IS_LOCKED);
