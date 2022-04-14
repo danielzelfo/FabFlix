@@ -191,12 +191,12 @@ public class IDMAuthenticationManager
         // update expire time in DB
         String sql = "UPDATE idm.refresh_token "
                 +"SET expire_time = :expire_time "
-                +"WHERE token = :token;";
+                +"WHERE id = :id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
                         .addValue("expire_time", Timestamp.from(refreshToken.getExpireTime()), Types.TIMESTAMP)
-                        .addValue("token", refreshToken.getToken(), Types.NCHAR);
+                        .addValue("id", refreshToken.getId(), Types.INTEGER);
 
         repo.getJdbcTemplate().update(sql, source);
 
@@ -206,12 +206,12 @@ public class IDMAuthenticationManager
         // update token status if DB to expired
         String sql = "UPDATE idm.refresh_token "
                 +"SET token_status_id = :token_status_id "
-                +"WHERE token = :token;";
+                +"WHERE id = :id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
                         .addValue("token_status_id", tokenStatus.id(), Types.INTEGER)
-                        .addValue("token", refreshToken.getToken(), Types.NCHAR);
+                        .addValue("id", refreshToken.getId(), Types.INTEGER);
 
         repo.getJdbcTemplate().update(sql, source);
     }
