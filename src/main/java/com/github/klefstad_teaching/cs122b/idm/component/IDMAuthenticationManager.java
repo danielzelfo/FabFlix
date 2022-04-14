@@ -226,32 +226,28 @@ public class IDMAuthenticationManager
         updateRefreshTokenStatus(refreshToken, TokenStatus.REVOKED);
     }
 
-    public User getUserFromRefreshToken(RefreshToken refreshToken)
-    {
+    public User getUserFromRefreshToken(RefreshToken refreshToken) {
         String sql =
-                "SELECT u.id, u.email, u.user_status_id, u.salt, u.hashed_password \n" +
-                        "FROM idm.user u\n" +
-                        "INNER JOIN idm.refresh_token rt ON rt.token = :refresh_token and u.id=rt.user_id;";
+                "SELECT id, email, user_status_id, salt, hashed_password " +
+                        "FROM idm.user " +
+                        "WHERE id = :id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
-                        .addValue("refresh_token", refreshToken.getToken(), Types.NCHAR);
+                        .addValue("id", refreshToken.getUserId(), Types.INTEGER);
 
 
-        List<User> users =
-                repo.getJdbcTemplate().query(
-                        sql,
-                        source,
+        return repo.getJdbcTemplate().queryForObject(
+                sql,
+                source,
 
-                        (rs, rowNum) ->
-                                new User()
-                                        .setId(rs.getInt("id"))
-                                        .setEmail(rs.getString("email"))
-                                        .setUserStatus(UserStatus.fromId(rs.getInt("user_status_id")))
-                                        .setSalt(rs.getString("salt"))
-                                        .setHashedPassword(rs.getString("hashed_password"))
-                );
-
-        return users.get(0);
+                (rs, rowNum) ->
+                        new User()
+                                .setId(rs.getInt("id"))
+                                .setEmail(rs.getString("email"))
+                                .setUserStatus(UserStatus.fromId(rs.getInt("user_status_id")))
+                                .setSalt(rs.getString("salt"))
+                                .setHashedPassword(rs.getString("hashed_password"))
+        );
     }
 }

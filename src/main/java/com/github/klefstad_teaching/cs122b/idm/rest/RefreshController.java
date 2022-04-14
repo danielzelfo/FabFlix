@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Instant;
+
 @RestController
 public class RefreshController {
     private final IDMAuthenticationManager authManager;
@@ -47,22 +49,24 @@ public class RefreshController {
 
         RefreshToken refreshToken = authManager.verifyRefreshToken(refreshTokenGiven);
 
-        if (jwtManager.hasExpired(refreshToken))
+        if (validate.refreshTokenStatusExpired(refreshToken))
             throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
 
-        if( refreshToken.getTokenStatus().equals(TokenStatus.REVOKED) ) {
+        if( validate.refreshTokenStatusRevoked(refreshToken) )
             throw new ResultError(IDMResults.REFRESH_TOKEN_IS_REVOKED);
-        }
 
-        if ( !jwtManager.needsRefresh(refreshToken) ) {
+        if ( !validate.refreshTokenCanRefresh(refreshToken) ) {
             authManager.expireRefreshToken(refreshToken);
             throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
         }
+
+        // needs refresh
+
         TokensResponseModel tokensResponseModel = new TokensResponseModel();
         tokensResponseModel.setResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN);
 
         User user = authManager.getUserFromRefreshToken(refreshToken);
-        // not expired -- refresh
+        jwtManager.updatedRefreshTokenExpireTime(refreshToken);
 
         if (validate.refreshTokenExpireTimePastMax(refreshToken)){
             // you revoke the refresh token in DB
@@ -76,7 +80,8 @@ public class RefreshController {
             tokensResponseModel.setRefreshToken(newRefreshToken.getToken());
         } else {
             // update same refresh token in DB
-            refreshToken = jwtManager.updatedRefreshTokenExpireTime(refreshToken);
+            Instant now = refreshToken.getExpireTime();
+
             authManager.updateRefreshTokenExpireTime(refreshToken);
 
             tokensResponseModel.setRefreshToken(refreshToken.getToken());

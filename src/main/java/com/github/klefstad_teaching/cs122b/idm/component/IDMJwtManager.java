@@ -95,16 +95,6 @@ public class IDMJwtManager
         return refreshToken;
     }
 
-    public boolean hasExpired(RefreshToken refreshToken)
-    {
-        return refreshToken.getTokenStatus().equals(TokenStatus.EXPIRED);
-    }
-
-    public boolean needsRefresh(RefreshToken refreshToken)
-    {
-        return refreshToken.getExpireTime().isAfter(Instant.now()) && refreshToken.getMaxLifeTime().isAfter(Instant.now());
-    }
-
     public RefreshToken updatedRefreshTokenExpireTime(RefreshToken refreshToken)
     {
         return refreshToken.setExpireTime(Instant.now().plus(jwtManager.getRefreshTokenExpire()));

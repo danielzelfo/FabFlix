@@ -1,6 +1,7 @@
 package com.github.klefstad_teaching.cs122b.idm.util;
 
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.TokenStatus;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Component;
 import java.text.ParseException;
@@ -41,11 +42,22 @@ public final class Validate
 
     public boolean refreshTokenHasValidFormat(String refreshToken) {
         try {
-            UUID id = UUID.fromString(refreshToken);
-            return id.toString().equals(refreshToken);
+            return UUID.fromString(refreshToken).toString().equals(refreshToken);
         } catch (IllegalArgumentException exception) {
             return false;
         }
 
+    }
+
+    public boolean refreshTokenStatusExpired(RefreshToken refreshToken) {
+        return refreshToken.getTokenStatus().equals(TokenStatus.EXPIRED);
+    }
+
+    public boolean refreshTokenStatusRevoked(RefreshToken refreshToken) {
+        return refreshToken.getTokenStatus().equals(TokenStatus.REVOKED);
+    }
+
+    public boolean refreshTokenCanRefresh(RefreshToken refreshToken) {
+        return refreshToken.getExpireTime().isAfter(Instant.now()) && refreshToken.getMaxLifeTime().isAfter(Instant.now());
     }
 }
