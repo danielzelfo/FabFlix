@@ -97,7 +97,7 @@ public class IDMJwtManager
 
     public void updatedRefreshTokenExpireTime(RefreshToken refreshToken)
     {
-        return refreshToken.setExpireTime(Instant.now().plus(jwtManager.getRefreshTokenExpire()));
+        refreshToken.setExpireTime(Instant.now().plus(jwtManager.getRefreshTokenExpire()));
     }
 
     private UUID generateUUID()

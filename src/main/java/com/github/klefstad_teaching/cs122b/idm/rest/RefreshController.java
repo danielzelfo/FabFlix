@@ -80,8 +80,6 @@ public class RefreshController {
             tokensResponseModel.setRefreshToken(newRefreshToken.getToken());
         } else {
             // update same refresh token in DB
-            Instant now = refreshToken.getExpireTime();
-
             authManager.updateRefreshTokenExpireTime(refreshToken);
 
             tokensResponseModel.setRefreshToken(refreshToken.getToken());
