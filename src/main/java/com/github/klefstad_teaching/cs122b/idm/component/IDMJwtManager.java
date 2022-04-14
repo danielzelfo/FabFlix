@@ -95,7 +95,7 @@ public class IDMJwtManager
         return refreshToken;
     }
 
-    public RefreshToken updatedRefreshTokenExpireTime(RefreshToken refreshToken)
+    public void updatedRefreshTokenExpireTime(RefreshToken refreshToken)
     {
         return refreshToken.setExpireTime(Instant.now().plus(jwtManager.getRefreshTokenExpire()));
     }
