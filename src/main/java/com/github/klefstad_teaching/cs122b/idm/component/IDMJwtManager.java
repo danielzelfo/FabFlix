@@ -12,7 +12,6 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
@@ -84,7 +83,7 @@ public class IDMJwtManager
 
     public RefreshToken buildRefreshToken(User user)
     {
-        String refreshTokenStr = UUID.randomUUID().toString();
+        String refreshTokenStr = generateUUID().toString();
 
         RefreshToken refreshToken = new RefreshToken()
                 .setToken(refreshTokenStr)
@@ -98,17 +97,17 @@ public class IDMJwtManager
 
     public boolean hasExpired(RefreshToken refreshToken)
     {
-        return false;
+        return refreshToken.getTokenStatus().equals(TokenStatus.EXPIRED);
     }
 
     public boolean needsRefresh(RefreshToken refreshToken)
     {
-        return false;
+        return refreshToken.getExpireTime().isAfter(Instant.now()) && refreshToken.getMaxLifeTime().isAfter(Instant.now());
     }
 
-    public void updateRefreshTokenExpireTime(RefreshToken refreshToken)
+    public RefreshToken updatedRefreshTokenExpireTime(RefreshToken refreshToken)
     {
-
+        return refreshToken.setExpireTime(Instant.now().plus(jwtManager.getRefreshTokenExpire()));
     }
 
     private UUID generateUUID()

@@ -5,19 +5,18 @@ import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.repo.IDMRepo;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.TokenStatus;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Base64;
@@ -150,25 +149,109 @@ public class IDMAuthenticationManager
 
     }
 
-    public RefreshToken verifyRefreshToken(String token)
+    public RefreshToken verifyRefreshToken(String token) throws ResultError
     {
-        return null;
+        String sql =
+                "SELECT id, token, user_id, token_status_id, expire_time, max_life_time " +
+                        "FROM idm.refresh_token " +
+                        "WHERE token = :token;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("token", token, Types.NCHAR);
+
+
+        List<RefreshToken> refreshTokens =
+                repo.getJdbcTemplate().query(
+                        sql,
+                        source,
+
+                        (rs, rowNum) ->
+                                new RefreshToken()
+                                        .setId(rs.getInt("id"))
+                                        .setToken(rs.getString("token"))
+                                        .setUserId(rs.getInt("user_id"))
+                                        .setTokenStatus(TokenStatus.fromId(rs.getInt("token_status_id")))
+                                        .setExpireTime(rs.getTimestamp("expire_time").toInstant())
+                                        .setMaxLifeTime(rs.getTimestamp("max_life_time").toInstant())
+                );
+
+        if (refreshTokens.size() == 0)
+            throw new ResultError(IDMResults.REFRESH_TOKEN_NOT_FOUND);
+
+        RefreshToken refreshToken = refreshTokens.get(0);
+
+
+
+        return refreshToken;
     }
 
-    public void updateRefreshTokenExpireTime(RefreshToken token)
+    public void updateRefreshTokenExpireTime(RefreshToken refreshToken)
     {
+        // update expire time in DB
+        String sql = "UPDATE idm.refresh_token "
+                +"SET expire_time = :expire_time "
+                +"WHERE token = :token;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("expire_time", Timestamp.from(refreshToken.getExpireTime()), Types.TIMESTAMP)
+                        .addValue("token", refreshToken.getToken(), Types.NCHAR);
+
+        repo.getJdbcTemplate().update(sql, source);
+
     }
 
-    public void expireRefreshToken(RefreshToken token)
-    {
+    private void updateRefreshTokenStatus(RefreshToken refreshToken, TokenStatus tokenStatus) {
+        // update token status if DB to expired
+        String sql = "UPDATE idm.refresh_token "
+                +"SET token_status_id = :token_status_id "
+                +"WHERE token = :token;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("token_status_id", tokenStatus.id(), Types.INTEGER)
+                        .addValue("token", refreshToken.getToken(), Types.NCHAR);
+
+        repo.getJdbcTemplate().update(sql, source);
     }
 
-    public void revokeRefreshToken(RefreshToken token)
+    public void expireRefreshToken(RefreshToken refreshToken)
     {
+        updateRefreshTokenStatus(refreshToken, TokenStatus.EXPIRED);
+    }
+
+    public void revokeRefreshToken(RefreshToken refreshToken)
+    {
+        updateRefreshTokenStatus(refreshToken, TokenStatus.REVOKED);
     }
 
     public User getUserFromRefreshToken(RefreshToken refreshToken)
     {
-        return null;
+        String sql =
+                "SELECT u.id, u.email, u.user_status_id, u.salt, u.hashed_password \n" +
+                        "FROM idm.user u\n" +
+                        "INNER JOIN idm.refresh_token rt ON rt.token = :refresh_token and u.id=rt.user_id;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("refresh_token", refreshToken.getToken(), Types.NCHAR);
+
+
+        List<User> users =
+                repo.getJdbcTemplate().query(
+                        sql,
+                        source,
+
+                        (rs, rowNum) ->
+                                new User()
+                                        .setId(rs.getInt("id"))
+                                        .setEmail(rs.getString("email"))
+                                        .setUserStatus(UserStatus.fromId(rs.getInt("user_status_id")))
+                                        .setSalt(rs.getString("salt"))
+                                        .setHashedPassword(rs.getString("hashed_password"))
+                );
+
+        return users.get(0);
     }
 }

@@ -2,7 +2,6 @@ package com.github.klefstad_teaching.cs122b.idm.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
-
 import java.time.Duration;
 import java.util.Objects;
 

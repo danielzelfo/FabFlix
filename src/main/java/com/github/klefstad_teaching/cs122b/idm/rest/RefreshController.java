@@ -1,10 +1,14 @@
 package com.github.klefstad_teaching.cs122b.idm.rest;
 
+import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMAuthenticationManager;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMJwtManager;
 import com.github.klefstad_teaching.cs122b.idm.model.request.RefreshTokenRequestModel;
-import com.github.klefstad_teaching.cs122b.idm.model.response.BasicResponseModel;
+import com.github.klefstad_teaching.cs122b.idm.model.response.TokensResponseModel;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.TokenStatus;
 import com.github.klefstad_teaching.cs122b.idm.util.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,9 +34,58 @@ public class RefreshController {
 
 
     @PostMapping("/refresh")
-    public ResponseEntity<BasicResponseModel> refresh(@RequestBody RefreshTokenRequestModel request) {
+    public ResponseEntity<TokensResponseModel> refresh(@RequestBody RefreshTokenRequestModel request) {
+
+        String refreshTokenGiven = request.getRefreshToken();
+
+        if (!validate.refreshTokenHasValidLength(refreshTokenGiven)) {
+            throw new ResultError(IDMResults.REFRESH_TOKEN_HAS_INVALID_LENGTH);
+        }
+        if (!validate.refreshTokenHasValidFormat(refreshTokenGiven)) {
+            throw new ResultError(IDMResults.REFRESH_TOKEN_HAS_INVALID_FORMAT);
+        }
+
+        RefreshToken refreshToken = authManager.verifyRefreshToken(refreshTokenGiven);
+
+        if (jwtManager.hasExpired(refreshToken))
+            throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
+
+        if( refreshToken.getTokenStatus().equals(TokenStatus.REVOKED) ) {
+            throw new ResultError(IDMResults.REFRESH_TOKEN_IS_REVOKED);
+        }
+
+        if ( !jwtManager.needsRefresh(refreshToken) ) {
+            authManager.expireRefreshToken(refreshToken);
+            throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
+        }
+        TokensResponseModel tokensResponseModel = new TokensResponseModel();
+        tokensResponseModel.setResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN);
+
+        User user = authManager.getUserFromRefreshToken(refreshToken);
+        // not expired -- refresh
+
+        if (validate.refreshTokenExpireTimePastMax(refreshToken)){
+            // you revoke the refresh token in DB
+            authManager.revokeRefreshToken(refreshToken);
+
+            // generate new refresh token
+            RefreshToken newRefreshToken = jwtManager.buildRefreshToken(user);
+            // insert new refresh token in DB
+            authManager.insertRefreshToken( newRefreshToken );
+
+            tokensResponseModel.setRefreshToken(newRefreshToken.getToken());
+        } else {
+            // update same refresh token in DB
+            refreshToken = jwtManager.updatedRefreshTokenExpireTime(refreshToken);
+            authManager.updateRefreshTokenExpireTime(refreshToken);
+
+            tokensResponseModel.setRefreshToken(refreshToken.getToken());
+        }
+
+        String accessToken = jwtManager.buildAccessToken(user);
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new BasicResponseModel()
-                        .setResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN));
+            .body(tokensResponseModel.setAccessToken(accessToken));
+
     }
 }

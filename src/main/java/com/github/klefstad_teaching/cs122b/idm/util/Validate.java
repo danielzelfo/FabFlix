@@ -1,11 +1,12 @@
 package com.github.klefstad_teaching.cs122b.idm.util;
 
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.nimbusds.jwt.SignedJWT;
 import org.springframework.stereotype.Component;
-
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public final class Validate
@@ -28,5 +29,23 @@ public final class Validate
 
     public boolean signedJWTExpired(SignedJWT signedJWT) throws ParseException {
         return signedJWT.getJWTClaimsSet().getExpirationTime().before(Date.from(Instant.now()));
+    }
+
+    public boolean refreshTokenExpireTimePastMax(RefreshToken refreshToken) {
+        return refreshToken.getExpireTime().isAfter(refreshToken.getMaxLifeTime());
+    }
+
+    public boolean refreshTokenHasValidLength(String refreshToken) {
+        return refreshToken.length() == 36;
+    }
+
+    public boolean refreshTokenHasValidFormat(String refreshToken) {
+        try {
+            UUID id = UUID.fromString(refreshToken);
+            return id.toString().equals(refreshToken);
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+
     }
 }
