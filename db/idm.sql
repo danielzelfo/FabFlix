@@ -1,6 +1,5 @@
 CREATE SCHEMA idm;
 
-
 CREATE TABLE `idm`.`token_status` (
           `id` INT NOT NULL,
           `value` VARCHAR(32) NOT NULL,
@@ -27,8 +26,8 @@ CREATE TABLE `idm`.`user` (
   `hashed_password` CHAR(88) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE,
-  INDEX `fk_user_status_id_idx` (`user_status_id` ASC) VISIBLE,
-  CONSTRAINT `fk_user_status_id`
+  INDEX `fk_idm_user_user_status_id_idx` (`user_status_id` ASC) VISIBLE,
+  CONSTRAINT `fk_idm_user_user_status_id`
       FOREIGN KEY (`user_status_id`)
           REFERENCES `idm`.`user_status` (`id`)
           ON DELETE RESTRICT
@@ -44,14 +43,14 @@ CREATE TABLE `idm`.`refresh_token` (
            `max_life_time` TIMESTAMP NOT NULL,
            PRIMARY KEY (`id`),
            UNIQUE INDEX `token_UNIQUE` (`token` ASC) VISIBLE,
-           INDEX `fk_refresh_token_user_id_idx` (`user_id` ASC) VISIBLE,
-           INDEX `fk_refresh_token_token_status_id_idx` (`token_status_id` ASC) VISIBLE,
-           CONSTRAINT `fk_refresh_token_user_id`
+           INDEX `fk_idm_refresh_token_user_id_idx` (`user_id` ASC) VISIBLE,
+           INDEX `fk_idm_refresh_token_token_status_id_idx` (`token_status_id` ASC) VISIBLE,
+           CONSTRAINT `fk_idm_refresh_token_user_id`
                FOREIGN KEY (`user_id`)
                    REFERENCES `idm`.`user` (`id`)
                    ON DELETE CASCADE
                    ON UPDATE CASCADE,
-           CONSTRAINT `fk_refresh_token_token_status_id`
+           CONSTRAINT `fk_idm_refresh_token_token_status_id`
                FOREIGN KEY (`token_status_id`)
                    REFERENCES `idm`.`token_status` (`id`)
                    ON DELETE RESTRICT
@@ -62,20 +61,17 @@ CREATE TABLE `idm`.`user_role` (
        `user_id` INT NOT NULL,
        `role_id` INT NOT NULL,
        PRIMARY KEY (`user_id`, `role_id`),
-       INDEX `fk_user_role_role_id_idx` (`role_id` ASC) VISIBLE,
-       CONSTRAINT `fk_user_role_user_id`
+       INDEX `fk_idm_user_role_role_id_idx` (`user_id` ASC) VISIBLE,
+       CONSTRAINT `fk_idm_user_role_user_id`
            FOREIGN KEY (`user_id`)
                REFERENCES `idm`.`user` (`id`)
                ON DELETE CASCADE
                ON UPDATE CASCADE,
-       CONSTRAINT `fk_user_role_role_id`
+       CONSTRAINT `fk_idm_user_role_role_id`
            FOREIGN KEY (`role_id`)
                REFERENCES `idm`.`role` (`id`)
                ON DELETE RESTRICT
                ON UPDATE CASCADE);
-
-
-
 
 
 INSERT INTO idm.role(id, name, description, precedence)
