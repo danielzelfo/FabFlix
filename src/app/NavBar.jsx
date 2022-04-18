@@ -42,6 +42,9 @@ const NavBar = () => {
             <StyledNavLink to="/login">
                 Login
             </StyledNavLink>
+            <StyledNavLink to="/register">
+                Register
+            </StyledNavLink>
         </StyledNav>
     );
 }

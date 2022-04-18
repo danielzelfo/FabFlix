@@ -33,3 +33,20 @@ export async function login(loginRequest) {
 
     return Axios.request(options);
 }
+
+
+export async function register_backend(registerRequest) {
+    const requestBody = {
+        email: registerRequest.email,
+        password: registerRequest.password
+    };
+
+    const options = {
+        method: "POST", // Method type ("POST", "GET", "DELETE", ect)
+        baseURL: Config.baseUrl, // Base URL (localhost:8081 for example)
+        url: Config.idm.register, // Path of URL ("/register")
+        data: requestBody // Data to send in Body (The RequestBody to send)
+    }
+
+    return Axios.request(options);
+}
