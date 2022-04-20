@@ -30,8 +30,8 @@ public class Validate
         this.directionOptions.add("DESC");
 
         this.rolesCanSeeHidden = new ArrayList<String>();
-        this.rolesCanSeeHidden.add("Admin");
-        this.rolesCanSeeHidden.add("Employee");
+        this.rolesCanSeeHidden.add("ADMIN");
+        this.rolesCanSeeHidden.add("EMPLOYEE");
     }
 
     public Boolean validLimit(Integer limit) {
@@ -47,6 +47,6 @@ public class Validate
     }
 
     public Boolean canSeeHiddenMovies(List<String> roles) {
-        return Collections.disjoint(roles, this.rolesCanSeeHidden);
+        return !Collections.disjoint(roles, this.rolesCanSeeHidden);
     }
 }
