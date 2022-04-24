@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
@@ -62,5 +63,38 @@ public class MovieController
                 .body(new MovieSearchResponse()
                         .setResult(MoviesResults.MOVIES_FOUND_WITHIN_SEARCH)
                         .setMovies(repo.getMovies(movieRequest, roles)));
+    }
+
+
+    @GetMapping("/movie/search/person/{personId}")
+    public ResponseEntity<MovieSearchResponse> movieSearch(@AuthenticationPrincipal SignedJWT user, @PathVariable Long personId, MovieSearchRequest movieRequest) {
+
+        List<String> roles;
+        try {
+            roles = user.getJWTClaimsSet().getStringListClaim(JWTManager.CLAIM_ROLES);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        if (movieRequest.getLimit() == null)
+            movieRequest.setLimit(10);
+        else if (!validate.validLimit(movieRequest.getLimit()))
+            throw new ResultError(MoviesResults.INVALID_LIMIT);
+
+        if (movieRequest.getPage() == null)
+            movieRequest.setPage(1);
+        else if (movieRequest.getPage() < 1)
+            throw new ResultError(MoviesResults.INVALID_PAGE);
+
+        if (movieRequest.getOrderBy() == null)
+            movieRequest.setOrderBy("title");
+        if (movieRequest.getDirection() == null)
+            movieRequest.setDirection("asc");
+
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MovieSearchResponse()
+                        .setResult(MoviesResults.MOVIES_WITH_PERSON_ID_FOUND)
+                        .setMovies(repo.getMoviesByPersonId(personId, roles, movieRequest)));
     }
 }

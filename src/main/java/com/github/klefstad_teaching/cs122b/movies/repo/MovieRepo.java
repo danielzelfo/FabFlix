@@ -107,26 +107,71 @@ public class MovieRepo
         }
         sql += "LIMIT :startpoint, :limit ";
         source.addValue("startpoint", (movieRequest.getPage()-1)*movieRequest.getLimit(), Types.INTEGER);
+        //LIMIT ASSUMED TO BE VALIDATED!!!
         source.addValue("limit", movieRequest.getLimit(), Types.INTEGER);
 
         sql += ") t; ";
-        System.out.println(sql);
+
+
+        return getMoviesFromDB(sql, source, new ResultError(MoviesResults.NO_MOVIES_FOUND_WITHIN_SEARCH));
+    }
+
+
+    public Movie[] getMoviesByPersonId(Long personId, List<String> roles, MovieSearchRequest movieRequest) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource();
+
+        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT('id', t.id, 'title', t.title, 'year', t.year, 'director', t.director_name, 'rating', t.rating, 'backdropPath', t.backdrop_path, 'posterPath', t.poster_path, 'hidden', t.hidden)) FROM " +
+                "( " +
+                "SELECT m.id, m.title, m.year, director.name AS director_name, m.rating, m.backdrop_path, m.poster_path, m.hidden " +
+                "FROM movies.movie_person p " +
+                "JOIN movies.movie m ON m.id = p.movie_id " +
+                "JOIN movies.person director ON director.id = m.director_id " +
+                "WHERE p.person_id = :personId ";
+        source.addValue("personId", personId, Types.INTEGER);
+        if(!validate.canSeeHiddenMovies(roles)) {
+            sql += "AND m.hidden = 0 ";
+        }
+
+
+        if (validate.validOrderBy(movieRequest.getOrderBy())) {
+            sql += "ORDER BY m." + movieRequest.getOrderBy() + " ";
+            if (validate.validDirection(movieRequest.getDirection().toUpperCase())) {
+                sql += movieRequest.getDirection().toUpperCase() + ", m.id ASC ";
+            } else {
+                throw new ResultError(MoviesResults.INVALID_DIRECTION);
+            }
+        } else {
+            throw new ResultError(MoviesResults.INVALID_ORDER_BY);
+        }
+        sql += "LIMIT :startpoint, :limit ";
+        source.addValue("startpoint", (movieRequest.getPage()-1)*movieRequest.getLimit(), Types.INTEGER);
+        //LIMIT ASSUMED TO BE VALIDATED!!!
+        source.addValue("limit", movieRequest.getLimit(), Types.INTEGER);
+
+
+        sql += ") t;";
+
+        return getMoviesFromDB(sql, source, new ResultError(MoviesResults.NO_MOVIES_WITH_PERSON_ID_FOUND));
+    }
+
+    private Movie[] getMoviesFromDB(String sql, MapSqlParameterSource source, ResultError throwOtherwise) {
         String jsonArrayString = "";
         try {
             jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
         } catch (EmptyResultDataAccessException exc ) {
             //this shouldn't happen
-            throw new ResultError(MoviesResults.NO_MOVIES_FOUND_WITHIN_SEARCH);
+            throw throwOtherwise;
         }
         if (jsonArrayString == null) {
-            throw new ResultError(MoviesResults.NO_MOVIES_FOUND_WITHIN_SEARCH);
+            throw throwOtherwise;
         }
 
         try {
             return this.objectMapper.readValue(jsonArrayString, Movie[].class);
         } catch( JsonProcessingException exc ) {
             //this shouldn't happen
-            throw new ResultError(MoviesResults.NO_MOVIES_FOUND_WITHIN_SEARCH);
+            throw throwOtherwise;
         }
     }
 }

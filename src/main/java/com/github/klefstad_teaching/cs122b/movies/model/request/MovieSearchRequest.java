@@ -1,5 +1,8 @@
 package com.github.klefstad_teaching.cs122b.movies.model.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class MovieSearchRequest {
     private String title;//	String	The movie's title (Search by substring)
     private Integer year;//	Integer	The movie's release year
