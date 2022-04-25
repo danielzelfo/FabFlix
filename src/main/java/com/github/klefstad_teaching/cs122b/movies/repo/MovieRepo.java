@@ -214,9 +214,9 @@ public class MovieRepo
         String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT('id', t.id, 'name', t.name) ) FROM " +
                 "( " +
                 "SELECT ROW_NUMBER() OVER (ORDER BY g.name ASC) , g.id, g.name " +
-                "FROM movies.movie m " +
-                "JOIN movies.movie_genre mg on mg.movie_id = m.id JOIN movies.genre g on g.id = mg.genre_id " +
-                "WHERE m.id = :movieId ";
+                "FROM movies.movie_genre mg " +
+                "JOIN movies.genre g on g.id = mg.genre_id " +
+                "WHERE mg.movie_id = :movieId ";
         if(!validate.canSeeHiddenMovies(roles)) {
             sql += "AND m.hidden = 0 ";
         }
@@ -248,9 +248,9 @@ public class MovieRepo
         String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT('id', t.id, 'name', t.name)) FROM " +
                 "(" +
                 "SELECT ROW_NUMBER() OVER (ORDER BY p.popularity DESC, p.id ASC), p.id, p.name " +
-                "FROM movies.movie m " +
-                "JOIN movies.movie_person mp ON m.id = mp.movie_id JOIN movies.person p ON p.id = mp.person_id AND p.id <> m.director_id " +
-                "WHERE m.id = :movieId ";
+                "FROM movies.movie_person mp " +
+                "JOIN movies.person p ON p.id = mp.person_id " +
+                "WHERE mp.movie_id = :movieId ";
         if(!validate.canSeeHiddenMovies(roles)) {
             sql += "AND m.hidden = 0 ";
         }
