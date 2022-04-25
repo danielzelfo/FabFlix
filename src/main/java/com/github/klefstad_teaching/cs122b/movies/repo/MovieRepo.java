@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.MoviesResults;
 import com.github.klefstad_teaching.cs122b.movies.model.request.MovieSearchRequest;
+import com.github.klefstad_teaching.cs122b.movies.repo.entity.Genre;
 import com.github.klefstad_teaching.cs122b.movies.repo.entity.Movie;
+import com.github.klefstad_teaching.cs122b.movies.repo.entity.Person;
 import com.github.klefstad_teaching.cs122b.movies.util.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -172,6 +174,105 @@ public class MovieRepo
         } catch( JsonProcessingException exc ) {
             //this shouldn't happen
             throw throwOtherwise;
+        }
+    }
+
+    public Movie getMovieDetails(Long movieId, List<String> roles) {   //, List<String> roles) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource();
+        String sql = "SELECT JSON_OBJECT('id', m.id, 'title', m.title, 'year', m.year, 'director', director.name, 'rating', m.rating, 'numVotes', m.num_votes, 'budget', m.budget, 'revenue', m.revenue, 'overview', m.overview, 'backdropPath', m.backdrop_path, 'posterPath', m.poster_path, 'hidden', m.hidden) " +
+                "FROM movies.movie m " +
+                "JOIN movies.person director ON director.id = m.director_id " +
+                "WHERE m.id = :movieId ";
+        if(!validate.canSeeHiddenMovies(roles)) {
+            sql += "AND m.hidden = 0;";
+        }
+        source.addValue("movieId", movieId, Types.INTEGER);
+
+        String jsonArrayString = "";
+        try {
+            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
+        } catch (EmptyResultDataAccessException exc ) {
+            //this shouldn't happen
+            throw new ResultError(MoviesResults.NO_MOVIE_WITH_ID_FOUND);
+        }
+        if (jsonArrayString == null) {
+            throw new ResultError(MoviesResults.NO_MOVIE_WITH_ID_FOUND);
+        }
+
+        try {
+            return this.objectMapper.readValue(jsonArrayString, Movie.class);
+        } catch( JsonProcessingException exc ) {
+            //this shouldn't happen
+            throw new ResultError(MoviesResults.NO_MOVIE_WITH_ID_FOUND);
+        }
+    }
+
+    public Genre[] getGenresFromMovieId(Long movieId, List<String> roles) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource();
+        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT('id', t.id, 'name', t.name) ) FROM " +
+                "( " +
+                "SELECT ROW_NUMBER() OVER (ORDER BY g.name ASC) , g.id, g.name " +
+                "FROM movies.movie m " +
+                "JOIN movies.movie_genre mg on mg.movie_id = m.id JOIN movies.genre g on g.id = mg.genre_id " +
+                "WHERE m.id = :movieId ";
+        if(!validate.canSeeHiddenMovies(roles)) {
+            sql += "AND m.hidden = 0 ";
+        }
+        sql += ") t;";
+        source.addValue("movieId", movieId, Types.INTEGER);
+
+        String jsonArrayString = "";
+        try {
+            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
+        } catch (EmptyResultDataAccessException exc ) {
+            //this shouldn't happen
+            return new Genre[0];
+        }
+        if (jsonArrayString == null) {
+            return new Genre[0];
+        }
+
+        try {
+            return this.objectMapper.readValue(jsonArrayString, Genre[].class);
+        } catch( JsonProcessingException exc ) {
+            //this shouldn't happen
+            return new Genre[0];
+        }
+    }
+
+    public Person[] getPersonsFromMovieId(Long movieId, List<String> roles) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource();
+        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT('id', t.id, 'name', t.name)) FROM " +
+                "(" +
+                "SELECT ROW_NUMBER() OVER (ORDER BY p.popularity DESC, p.id ASC), p.id, p.name " +
+                "FROM movies.movie m " +
+                "JOIN movies.movie_person mp ON m.id = mp.movie_id JOIN movies.person p ON p.id = mp.person_id AND p.id <> m.director_id " +
+                "WHERE m.id = :movieId ";
+        if(!validate.canSeeHiddenMovies(roles)) {
+            sql += "AND m.hidden = 0 ";
+        }
+        sql += ") t;";
+        source.addValue("movieId", movieId, Types.INTEGER);
+
+        String jsonArrayString = "";
+        try {
+            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
+        } catch (EmptyResultDataAccessException exc ) {
+            //this shouldn't happen
+            return new Person[0];
+        }
+        if (jsonArrayString == null) {
+            return new Person[0];
+        }
+
+        try {
+            return this.objectMapper.readValue(jsonArrayString, Person[].class);
+        } catch( JsonProcessingException exc ) {
+            //this shouldn't happen
+            return new Person[0];
         }
     }
 }

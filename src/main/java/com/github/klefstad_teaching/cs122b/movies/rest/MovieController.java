@@ -5,6 +5,7 @@ import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.core.result.MoviesResults;
 import com.github.klefstad_teaching.cs122b.core.security.JWTManager;
 import com.github.klefstad_teaching.cs122b.movies.model.request.MovieSearchRequest;
+import com.github.klefstad_teaching.cs122b.movies.model.response.MovieResponse;
 import com.github.klefstad_teaching.cs122b.movies.model.response.MovieSearchResponse;
 import com.github.klefstad_teaching.cs122b.movies.repo.MovieRepo;
 import com.github.klefstad_teaching.cs122b.movies.util.Validate;
@@ -21,14 +22,12 @@ import java.text.ParseException;
 import java.util.List;
 
 @RestController
-public class MovieController
-{
+public class MovieController {
     private final MovieRepo repo;
     private final Validate validate;
 
     @Autowired
-    public MovieController(MovieRepo repo, Validate validate)
-    {
+    public MovieController(MovieRepo repo, Validate validate) {
         this.repo = repo;
         this.validate = validate;
     }
@@ -96,5 +95,22 @@ public class MovieController
                 .body(new MovieSearchResponse()
                         .setResult(MoviesResults.MOVIES_WITH_PERSON_ID_FOUND)
                         .setMovies(repo.getMoviesByPersonId(personId, roles, movieRequest)));
+    }
+
+    @GetMapping("/movie/{movieId}")
+    public ResponseEntity<MovieResponse> movieSearch(@AuthenticationPrincipal SignedJWT user, @PathVariable Long movieId) {
+        List<String> roles;
+        try {
+            roles = user.getJWTClaimsSet().getStringListClaim(JWTManager.CLAIM_ROLES);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new MovieResponse()
+                        .setResult(MoviesResults.MOVIE_WITH_ID_FOUND)
+                        .setMovie(repo.getMovieDetails(movieId, roles))
+                        .setGenres(repo.getGenresFromMovieId(movieId, roles))
+                        .setPersons(repo.getPersonsFromMovieId(movieId, roles)));
     }
 }

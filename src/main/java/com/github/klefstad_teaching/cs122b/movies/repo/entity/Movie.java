@@ -1,11 +1,18 @@
 package com.github.klefstad_teaching.cs122b.movies.repo.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Movie {
     private Integer id;
     private String title;
     private Integer year;
     private String director;
     private Float rating;
+    private Long numVotes;
+    private Long budget;
+    private Long revenue;
+    private String overview;
     private String backdropPath;
     private String posterPath;
     private Boolean hidden;
@@ -79,6 +86,42 @@ public class Movie {
 
     public Movie setHidden(Boolean hidden) {
         this.hidden = hidden;
+        return this;
+    }
+
+    public Long getNumVotes() {
+        return numVotes;
+    }
+
+    public Movie setNumVotes(Long numVotes) {
+        this.numVotes = numVotes;
+        return this;
+    }
+
+    public Long getBudget() {
+        return budget;
+    }
+
+    public Movie setBudget(Long budget) {
+        this.budget = budget;
+        return this;
+    }
+
+    public Long getRevenue() {
+        return revenue;
+    }
+
+    public Movie setRevenue(Long revenue) {
+        this.revenue = revenue;
+        return this;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public Movie setOverview(String overview) {
+        this.overview = overview;
         return this;
     }
 }
