@@ -10,9 +10,10 @@ import java.util.List;
 public class Validate
 {
     private List<Integer> limitOptions;
-    private List<String> orderbyOptions;
+    private List<String> movieOrderbyOptions;
     private List<String> directionOptions;
     private List<String> rolesCanSeeHidden;
+    private List<String> personOrderbyOptions;
 
     public Validate(){
         this.limitOptions = new ArrayList<Integer>();
@@ -20,10 +21,10 @@ public class Validate
         this.limitOptions.add(25);
         this.limitOptions.add(50);
 
-        this.orderbyOptions = new ArrayList<String>();
-        this.orderbyOptions.add("title");
-        this.orderbyOptions.add("rating");
-        this.orderbyOptions.add("year");
+        this.movieOrderbyOptions = new ArrayList<String>();
+        this.movieOrderbyOptions.add("title");
+        this.movieOrderbyOptions.add("rating");
+        this.movieOrderbyOptions.add("year");
 
         this.directionOptions = new ArrayList<String>();
         this.directionOptions.add("ASC");
@@ -32,14 +33,23 @@ public class Validate
         this.rolesCanSeeHidden = new ArrayList<String>();
         this.rolesCanSeeHidden.add("ADMIN");
         this.rolesCanSeeHidden.add("EMPLOYEE");
+
+        this.personOrderbyOptions = new ArrayList<String>();
+        this.personOrderbyOptions.add("name");
+        this.personOrderbyOptions.add("popularity");
+        this.personOrderbyOptions.add("birthday");
     }
 
     public Boolean validLimit(Integer limit) {
         return limitOptions.contains(limit);
     }
 
-    public Boolean validOrderBy(String orderBy) {
-        return orderbyOptions.contains(orderBy);
+    public Boolean validMovieOrderBy(String orderBy) {
+        return movieOrderbyOptions.contains(orderBy);
+    }
+
+    public Boolean validPersonOrderBy(String orderBy) {
+        return personOrderbyOptions.contains(orderBy);
     }
 
     public Boolean validDirection(String direction) {

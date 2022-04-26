@@ -3,25 +3,25 @@ package com.github.klefstad_teaching.cs122b.movies.model.response;
 import com.github.klefstad_teaching.cs122b.core.result.Result;
 import com.github.klefstad_teaching.cs122b.movies.repo.entity.PersonDetails;
 
-public class PersonResponse {
+public class PersonSearchResponse {
     private Result result;
-    private PersonDetails person;
+    private PersonDetails[] persons;
 
     public Result getResult() {
         return result;
     }
 
-    public PersonResponse setResult(Result result) {
+    public PersonSearchResponse setResult(Result result) {
         this.result = result;
         return this;
     }
 
-    public PersonDetails getPerson() {
-        return person;
+    public PersonDetails[] getPersons() {
+        return persons;
     }
 
-    public PersonResponse setPerson(PersonDetails person) {
-        this.person = person;
+    public PersonSearchResponse setPersons(PersonDetails[] persons) {
+        this.persons = persons;
         return this;
     }
 }

@@ -97,7 +97,7 @@ public class MovieRepo
             sql += "m.hidden = 0 ";
         }
 
-        if (validate.validOrderBy(movieRequest.getOrderBy())) {
+        if (validate.validMovieOrderBy(movieRequest.getOrderBy())) {
             sql += "ORDER BY m." + movieRequest.getOrderBy() + " ";
             if (validate.validDirection(movieRequest.getDirection().toUpperCase())) {
                 sql += movieRequest.getDirection().toUpperCase() + ", m.id ASC ";
@@ -136,7 +136,7 @@ public class MovieRepo
         }
 
 
-        if (validate.validOrderBy(movieRequest.getOrderBy())) {
+        if (validate.validMovieOrderBy(movieRequest.getOrderBy())) {
             sql += "ORDER BY m." + movieRequest.getOrderBy() + " ";
             if (validate.validDirection(movieRequest.getDirection().toUpperCase())) {
                 sql += movieRequest.getDirection().toUpperCase() + ", m.id ASC ";
