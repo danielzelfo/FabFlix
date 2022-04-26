@@ -45,6 +45,9 @@ const NavBar = () => {
             <StyledNavLink to="/register">
                 Register
             </StyledNavLink>
+            <StyledNavLink to="/search">
+                Search
+            </StyledNavLink>
         </StyledNav>
     );
 }
