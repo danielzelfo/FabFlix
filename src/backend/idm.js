@@ -26,7 +26,7 @@ export async function login(loginRequest) {
 
     const options = {
         method: "POST", // Method type ("POST", "GET", "DELETE", ect)
-        baseURL: Config.baseUrl, // Base URL (localhost:8081 for example)
+        baseURL: Config.idm.baseUrl, // Base URL (localhost:8081 for example)
         url: Config.idm.login, // Path of URL ("/login")
         data: requestBody // Data to send in Body (The RequestBody to send)
     }
@@ -43,7 +43,7 @@ export async function register_backend(registerRequest) {
 
     const options = {
         method: "POST", // Method type ("POST", "GET", "DELETE", ect)
-        baseURL: Config.baseUrl, // Base URL (localhost:8081 for example)
+        baseURL: Config.idm.baseUrl, // Base URL (localhost:8081 for example)
         url: Config.idm.register, // Path of URL ("/register")
         data: requestBody // Data to send in Body (The RequestBody to send)
     }

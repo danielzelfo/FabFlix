@@ -75,6 +75,12 @@ const Login = () => {
 
     const {register, getValues, handleSubmit} = useForm();
 
+    const handleLoginSucess = (response) => {
+        setAccessToken(response.data["accessToken"])
+        setRefreshToken(response.data["refreshToken"])
+        alert("login successful.");
+    }
+
     const submitLogin = () => {
         const email = getValues("email");
         const password = getValues("password");
@@ -85,7 +91,7 @@ const Login = () => {
         }
 
         login(payLoad)
-            .then(response => alert(JSON.stringify(response.data, null, 2)))
+            .then(response => handleLoginSucess(response))
             .catch(error => alert(JSON.stringify(error.response.data, null, 2)))
     }
 
