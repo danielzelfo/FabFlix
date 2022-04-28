@@ -378,13 +378,19 @@ We set our userId using `.claim(JWTManager.CLAIM_ID, userId)` we can get that id
 
 A convient function to use to get our roles our of our `SignedJWT` is  `.getStringListClaim(JWTManager.CLAIM_ROLES)` which returns our user's roles as a list of `String`s
 
-### Person VS Director
-- Our database schema has a `movie_person` table that has the list of `person` in a `movie` **NOTE** that this list does **NOT** contain the director, the director is only associated with a movie by the `director_id` column. Every movie is guaranteed to have a director **BUT** not every movie has `person` associated with them.
+### Person and Director
+- Our database schema has a `movie_person` table that has the list of `person` in a `movie`. Not every movie is guaranteed to have a `person` in it. (There could be no `movie_person` assoications for a certain movie).
+- However every movie is guaranteed to have a director To get the director of a movie you must join the `movie` and `person` table like this:
+```sql
+SELECT m.title, ... , p.name
+FROM movies m
+    JOIN person p ON p.id = m.director_id
+```
 - For the endpoint [GET: Movie Search By Person Id](#movie-search-by-person-id) do not account for director values, search only for `persons` in `movie_person`. This should prevent the SQL Queries from becoming too complex.
  
 ### Substring Search
  
-For queries marked as (Search by [substring](#substring-search)) make sure to have the value surrounded by '%' to allow for search by sub-string. Refer to this section in the activity: [Wildcard String Matching](https://github.com/klefstad-teaching/CS122B-A4-SQL/blob/main/README.md#wildcard-string-matching)
+For queries marked as (Search by [substring](#substring-search)) make sure to have the value surrounded by '%' **on both sides** (`%value%`)to allow for search by sub-string. Refer to this section in the activity: [Wildcard String Matching](https://github.com/klefstad-teaching/CS122B-A4-SQL/blob/main/README.md#wildcard-string-matching)
  
 # Endpoints
 
@@ -401,7 +407,7 @@ Each movie in the <code>movies.movie</code> table has a <code>hidden</code> fiel
 For the following string search parameters (<code>title</code>, <code>director</code>, <code>genre</code>), you should use the <code>LIKE</code> operator with the <code>%</code> wildcard on both sides of the value. For example, if a value of 'knight' was given as the <code>title</code> search parameter, then the sql command should look like this: <code>title LIKE '%knight%'</code>
 
 ### Pagination
-We simulate **Pagination** in our search quries having a `page` and `limit` query and using these two pararmeters to set our `OFFSET` and `LIMIT` in our SQL query.
+We simulate **Pagination** in our search queries having a `page` and `limit` query and using these two parameters to set our `OFFSET` and `LIMIT` in our SQL query.
 
 1. We set our SQL `LIMIT` to whatever our query `limit` is (or the default)
 2. We set our SQL `OFFSET` to ((`page` - 1) * `limit`). This gives us the amount of movies to skip.
@@ -883,10 +889,10 @@ movies: MovieDetail
     posterPath: String
     hidden: Boolean
 genres: Genre[] 
-    genreId: Integer
+    genreId: Long
     name: String
 persons: Person[] 
-    personId: Integer
+    personId: Long
     name: String</pre></td>
       <td align="left"><pre lang="json">
 {
@@ -1053,7 +1059,7 @@ GET /person/search
 result: Result
     code: Integer
     message: String
-persons: id
+persons: Person[]
     personId: Long
     name: String
     birthday: String (nullable)
