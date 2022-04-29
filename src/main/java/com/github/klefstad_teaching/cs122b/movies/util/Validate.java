@@ -20,6 +20,7 @@ public class Validate
         this.limitOptions.add(10);
         this.limitOptions.add(25);
         this.limitOptions.add(50);
+        this.limitOptions.add(100);
 
         this.movieOrderbyOptions = new ArrayList<String>();
         this.movieOrderbyOptions.add("title");
