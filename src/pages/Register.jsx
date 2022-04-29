@@ -1,5 +1,4 @@
 import React from "react";
-import {useUser} from "hook/User";
 import styled from "styled-components";
 import {useForm} from "react-hook-form";
 import {register_backend} from "backend/idm";

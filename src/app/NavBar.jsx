@@ -6,9 +6,10 @@ const StyledNav = styled.nav`
   display: flex;
   justify-content: center;
 
-  width: calc(100vw - 10px);
+  width: calc(100% - 10px);
   height: 50px;
-  padding: 5px;
+  position: relative;
+  left: 5px;
 
   background-color: #fff;
 `;

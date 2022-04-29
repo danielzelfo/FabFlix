@@ -11,8 +11,9 @@ const StyledDiv = styled.div`
   display: flex;
   justify-content: center;
 
-  width: 100vw;
-  height: 100vh;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(100vh - 50px);
   padding: 25px;
 
   background: #ffffff;
