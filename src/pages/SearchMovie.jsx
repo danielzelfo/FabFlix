@@ -132,6 +132,13 @@ const SearchMovie = () => {
     }
 
     const submitGeneralSearch = () => {
+        const payLoad = {}
+
+        const defaultLimit = "10";
+        const defaultPage = "1";
+        const defaultOrderBy = "title";
+        const defaultDirection = "ASC";
+
         const movie_title = getValues("movie_title");
         const movie_year = getValues("movie_year");
         const movie_director = getValues("movie_director");
@@ -141,19 +148,24 @@ const SearchMovie = () => {
         const filter_orderBy = getValues("filter_orderBy");
         const filter_direction = getValues("filter_direction");
 
-        const payLoad = {
-            movie_title: movie_title,
-            movie_year: movie_year,
-            movie_director: movie_director,
-            movie_genre: movie_genre,
-            filter_limit: filter_limit,
-            filter_page: filter_page,
-            filter_orderBy: filter_orderBy,
-            filter_direction: filter_direction,
-            accessToken: accessToken
-        }
+        if (movie_title !== "")
+            payLoad.title = movie_title;
+        if (movie_year !== "")
+            payLoad.year = parseInt(movie_year);
+        if (movie_director !== "")
+            payLoad.director = movie_director;
+        if (movie_genre !== "")
+            payLoad.genre = movie_genre;
+        if (filter_limit !== defaultLimit)
+            payLoad.limit = parseInt(filter_limit);
+        if (filter_page !== "" && filter_page !== defaultPage)
+            payLoad.page = parseInt(filter_page);
+        if (filter_orderBy !== defaultOrderBy)
+            payLoad.orderBy = filter_orderBy;
+        if (filter_direction !== defaultDirection)
+            payLoad.direction = filter_direction;
 
-        return search_backend(payLoad)
+        return search_backend(payLoad, accessToken)
     }
 
     const nextPage = () => {

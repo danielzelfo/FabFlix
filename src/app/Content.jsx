@@ -47,7 +47,7 @@ const Content = () => {
             <Routes>
                 <Route path="/register" element={<Register/>}/>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/search" element={<SearchMovie/>}/>
+                <Route path="/movies/search" element={<SearchMovie/>}/>
                 <Route path="/" element={<Home/>}/>
             </Routes>
         </StyledDiv>

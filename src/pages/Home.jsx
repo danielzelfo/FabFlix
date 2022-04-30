@@ -24,7 +24,7 @@ const Home = () => {
             <h1>Home</h1>
             <MapDiv>
                 <li>
-                    <ol><Link to="/search">Search for movies</Link></ol>
+                    <ol><Link to="/movies/search">Search for movies</Link></ol>
                 </li>
             </MapDiv>
         </MainDiv>
