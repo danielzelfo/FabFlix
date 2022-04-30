@@ -3,6 +3,7 @@ import styled from "styled-components";
 import {useForm} from "react-hook-form";
 import {search_backend} from "backend/movies";
 import {useUser} from "hook/User";
+import { useNavigate } from "react-router-dom";
 
 const MainDiv = styled.div`
   width: calc(100% - 50px);
@@ -85,8 +86,15 @@ const CustomInput = styled.input`
     outline: none;
 `
 
+const TableHeaderCellP = styled.p`
+    font-weight: bold;
+    text-align: center;
+`
+
 
 const SearchMovie = () => {
+    const navigate = useNavigate();
+
     const {
         accessToken, setAccessToken,
         refreshToken, setRefreshToken
@@ -114,13 +122,13 @@ const SearchMovie = () => {
     const submitSearch = () => {
         submitGeneralSearch()
             .then(response => handleResultSuccess(response))
-            .catch(error => alert(JSON.stringify(error, null, 2)))
+            .catch(error => navigate("/login"))
     }
 
     const submitPageSearch = (initPage) => {
         submitGeneralSearch()
             .then(response => handlePageResultSuccess(response, initPage))
-            .catch(error => alert(JSON.stringify(error, null, 2)))
+            .catch(error => navigate("/login"))
     }
 
     const submitGeneralSearch = () => {
@@ -206,6 +214,11 @@ const SearchMovie = () => {
                 <div>
                     <ResultTable>
                         <ResultBody>
+                            <ResultRow>
+                                <ResultCell><TableHeaderCellP>Title</TableHeaderCellP></ResultCell>
+                                <ResultCell><TableHeaderCellP>Year</TableHeaderCellP></ResultCell>
+                                <ResultCell><TableHeaderCellP>Director</TableHeaderCellP></ResultCell>
+                            </ResultRow>
                         {
                         results.map( result =>
                             <ResultRow key={result.id}>
