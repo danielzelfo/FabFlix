@@ -1,7 +1,7 @@
 import React from "react";
 import {Route, Routes} from "react-router-dom";
 
-import Search from "pages/Search";
+import SearchMovie from "pages/SearchMovie";
 import Register from "pages/Register";
 import Login from "pages/Login";
 import Home from "pages/Home";
@@ -47,7 +47,7 @@ const Content = () => {
             <Routes>
                 <Route path="/register" element={<Register/>}/>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/search" element={<Search/>}/>
+                <Route path="/search" element={<SearchMovie/>}/>
                 <Route path="/" element={<Home/>}/>
             </Routes>
         </StyledDiv>
