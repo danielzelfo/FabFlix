@@ -107,7 +107,7 @@ const SearchMovie = () => {
     const handleResultSuccess = (response) => {
         let movies = response.data["movies"];
         if (movies === undefined)
-            movies = {};
+            movies = [];
         resultsSetter(movies);
     }
 
