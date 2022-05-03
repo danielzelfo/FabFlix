@@ -15,9 +15,6 @@ const MapDiv = styled.div`
     margin-top: 20px;
 `
 
-const StyledH1 = styled.h1`
-`
-
 const Home = () => {
     return (
         <MainDiv>

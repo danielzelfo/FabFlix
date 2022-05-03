@@ -93,11 +93,13 @@ const TableHeaderCellP = styled.p`
 
 
 const SearchMovie = () => {
+    const field_names = ["title", "year", "director", "genre", "limit", "page", "orderBy", "direction"];
+    const default_field_values = ["", "", "", "", "10", "1", "title", "ASC"]
+
     const navigate = useNavigate();
 
     const {
-        accessToken, setAccessToken,
-        refreshToken, setRefreshToken
+        accessToken
     } = useUser();
 
     const {register, getValues, setValue, handleSubmit} = useForm();
@@ -109,7 +111,7 @@ const SearchMovie = () => {
     const [pageData, pageDataSetter] = useState({});
 
     const handleResultSuccess = (request, response) => {
-        let movies = response.data["movies"];
+        let movies = response.data.movies;
         if (movies === undefined)
             movies = [];
         // set results to show in html
@@ -120,78 +122,52 @@ const SearchMovie = () => {
 
     const handlePageResultSuccess = (request, response) => {
         // set the page if the response is not empty
-        if (response.data["movies"] !== undefined) {
+        if (response.data.movies !== undefined) {
             handleResultSuccess(request, response);
-            setValue("movie_title", request.title === undefined ? "" : request.title);
-            setValue("movie_year", request.year === undefined ? "" : request.year.toString());
-            setValue("movie_director", request.director === undefined ? "" : request.director);
-            setValue("movie_genre", request.genre === undefined ? "" : request.genre);
-            setValue("filter_limit", request.limit === undefined ? "10" : request.limit.toString());
-            setValue("filter_page", request.page === undefined ? "" : request.page.toString()); // (checking just incase)
-            setValue("filter_orderBy", request.orderBy === undefined ? "title" : request.orderBy);
-            setValue("filter_direction", request.direction === undefined ? "ASC" : request.direction);
+            for(let i = 0; i < field_names.length; ++i) {
+                setValue(field_names[i], request[field_names[i]] === undefined ? default_field_values[i] : request[field_names[i]]);
+            }
         }
     }
 
     const submitSearch = () => {
         const payLoad = {}
 
-        const defaultLimit = "10";
-        const defaultPage = "1";
-        const defaultOrderBy = "title";
-        const defaultDirection = "ASC";
-
-        const movie_title = getValues("movie_title");
-        const movie_year = getValues("movie_year");
-        const movie_director = getValues("movie_director");
-        const movie_genre = getValues("movie_genre");
-        const filter_limit = getValues("filter_limit");
-        const filter_page = getValues("filter_page");
-        const filter_orderBy = getValues("filter_orderBy");
-        const filter_direction = getValues("filter_direction");
-
-        if (movie_title !== "")
-            payLoad.title = movie_title;
-        if (movie_year !== "")
-            payLoad.year = parseInt(movie_year);
-        if (movie_director !== "")
-            payLoad.director = movie_director;
-        if (movie_genre !== "")
-            payLoad.genre = movie_genre;
-        if (filter_limit !== defaultLimit)
-            payLoad.limit = parseInt(filter_limit);
-        if (filter_page !== "" && filter_page !== defaultPage)
-            payLoad.page = parseInt(filter_page);
-        if (filter_orderBy !== defaultOrderBy)
-            payLoad.orderBy = filter_orderBy;
-        if (filter_direction !== defaultDirection)
-            payLoad.direction = filter_direction;
-
+        for(let i = 0; i < field_names.length; ++i) {
+            let value = getValues(field_names[i]);
+            if (value !== "" && !(default_field_values[i] !== "" && value === default_field_values[i]))
+                payLoad[field_names[i]] = value;
+        }
 
         search_backend(payLoad, accessToken)
             .then(response => handleResultSuccess(payLoad, response))
-            // .catch(error => navigate("/login"))
+            .catch(error => navigate("/login"))
     }
 
     const submitPageSearch = (targetPage) => {
         // use current page request data / change page to target page
-        const payLoad = pageData;
-        payLoad["page"] = targetPage;
+        const payLoad = {};
+        Object.assign(payLoad, pageData);
+        if (targetPage !== 1)
+            payLoad.page = targetPage;
+        else if (payLoad.page !== undefined) 
+            delete payLoad.page;
+        
         search_backend(payLoad, accessToken)
             .then(response => handlePageResultSuccess(payLoad, response))
-            // .catch(error => navigate("/login"))
+            .catch(error => navigate("/login"))
     }
 
     const nextPage = () => {
         // get page number from last successful request data
-        let page = pageData["page"];
+        let page = pageData.page;
         if (page === undefined)
             submitPageSearch(2) // undefined means page 1 (default)
         else
             submitPageSearch(page + 1)
     }
     const prevPage = () => {
-        let page = pageData["page"];
+        let page = pageData.page;
         if (page !== undefined && page !== 1) {
             submitPageSearch(page - 1);
         }
@@ -202,32 +178,32 @@ const SearchMovie = () => {
             <VerticalDiv style={{alignItems: "center"}}>
                 <h1>Search Movie</h1>
                 <HorizontalDiv style={{justifyContent: "right"}}>
-                    <CustomSelect id="filter_limit" {...register("filter_limit")}>
+                    <CustomSelect id="limit" {...register("limit")}>
                         <option value="10">Limit: 10</option>
                         <option value="25">Limit: 25</option>
                         <option value="50">Limit: 50</option>
                         <option value="100">Limit: 100</option>
                     </CustomSelect>
-                    <CustomSelect id="filter_orderBy" {...register("filter_orderBy")}>
+                    <CustomSelect id="orderBy" {...register("orderBy")}>
                         <option value="title">Sort by: title</option>
                         <option value="rating">Sort by: rating</option>
                         <option value="year">Sort by: year</option>
                     </CustomSelect>
-                    <CustomSelect id="filter_direction" {...register("filter_direction")}>
+                    <CustomSelect id="direction" {...register("direction")}>
                         <option value="ASC">Direction: ASC</option>
                         <option value="DESC">Direction: DESC</option>
                     </CustomSelect>
                 </HorizontalDiv>
                 <HorizontalDiv style={{justifyContent: "center"}}>
-                    <CustomInput placeholder="title" {...register("movie_title")} />
-                    <CustomInput placeholder="year" {...register("movie_year")} />
-                    <CustomInput placeholder="director" {...register("movie_director")} />
-                    <CustomInput placeholder="genre" {...register("movie_genre")} />
+                    <CustomInput placeholder="title" {...register("title")} />
+                    <CustomInput placeholder="year" {...register("year")} />
+                    <CustomInput placeholder="director" {...register("director")} />
+                    <CustomInput placeholder="genre" {...register("genre")} />
                     <CustomButton onClick={handleSubmit(submitSearch)}>Search</CustomButton>
                 </HorizontalDiv>
                 <HorizontalDiv style={{justifyContent: "right"}}>
-                    <label htmlFor="filter_page">Page</label>
-                    <CustomInput id="filter_page" type="number" min="1" placeholder="1" style={{width: "4em"}} {...register("filter_page")}/>
+                    <label htmlFor="page">Page</label>
+                    <CustomInput id="page" type="number" min="1" placeholder="1" style={{width: "4em"}} {...register("page")}/>
                 </HorizontalDiv>
             </VerticalDiv>
             
