@@ -102,36 +102,38 @@ const SearchMovie = () => {
 
     const {register, getValues, setValue, handleSubmit} = useForm();
 
+    // current page response data
     const [results, resultsSetter] = useState([]);
 
-    const handleResultSuccess = (response) => {
+    // current page request data
+    const [pageData, pageDataSetter] = useState({});
+
+    const handleResultSuccess = (request, response) => {
         let movies = response.data["movies"];
         if (movies === undefined)
             movies = [];
+        // set results to show in html
         resultsSetter(movies);
+        // save the last successful request data (used by next / prev buttons)
+        pageDataSetter(request);
     }
 
-    const handlePageResultSuccess = (response, initPage) => {
+    const handlePageResultSuccess = (request, response) => {
+        // set the page if the response is not empty
         if (response.data["movies"] !== undefined) {
-            handleResultSuccess(response);
-        } else {
-            setValue("filter_page", initPage);
+            handleResultSuccess(request, response);
+            setValue("movie_title", request.title === undefined ? "" : request.title);
+            setValue("movie_year", request.year === undefined ? "" : request.year.toString());
+            setValue("movie_director", request.director === undefined ? "" : request.director);
+            setValue("movie_genre", request.genre === undefined ? "" : request.genre);
+            setValue("filter_limit", request.limit === undefined ? "10" : request.limit.toString());
+            setValue("filter_page", request.page === undefined ? "" : request.page.toString()); // (checking just incase)
+            setValue("filter_orderBy", request.orderBy === undefined ? "title" : request.orderBy);
+            setValue("filter_direction", request.direction === undefined ? "ASC" : request.direction);
         }
     }
 
     const submitSearch = () => {
-        submitGeneralSearch()
-            .then(response => handleResultSuccess(response))
-            .catch(error => navigate("/login"))
-    }
-
-    const submitPageSearch = (initPage) => {
-        submitGeneralSearch()
-            .then(response => handlePageResultSuccess(response, initPage))
-            .catch(error => navigate("/login"))
-    }
-
-    const submitGeneralSearch = () => {
         const payLoad = {}
 
         const defaultLimit = "10";
@@ -165,26 +167,34 @@ const SearchMovie = () => {
         if (filter_direction !== defaultDirection)
             payLoad.direction = filter_direction;
 
-        return search_backend(payLoad, accessToken)
+
+        search_backend(payLoad, accessToken)
+            .then(response => handleResultSuccess(payLoad, response))
+            // .catch(error => navigate("/login"))
+    }
+
+    const submitPageSearch = (targetPage) => {
+        // use current page request data / change page to target page
+        const payLoad = pageData;
+        payLoad["page"] = targetPage;
+        search_backend(payLoad, accessToken)
+            .then(response => handlePageResultSuccess(payLoad, response))
+            // .catch(error => navigate("/login"))
     }
 
     const nextPage = () => {
-        let page = getValues("filter_page");
-        if (page === "")
-            page = "1";
-        let initPage = page;
-        setValue("filter_page", (parseInt(page)+1).toString());
-        submitPageSearch(initPage)
+        // get page number from last successful request data
+        let page = pageData["page"];
+        if (page === undefined)
+            submitPageSearch(2) // undefined means page 1 (default)
+        else
+            submitPageSearch(page + 1)
     }
     const prevPage = () => {
-        let page = getValues("filter_page");
-        let initPage = page;
-        if (page !== "" && page !== "1") {
-            setValue("filter_page", (parseInt(page)-1).toString());
-        } else {
-            initPage = "1";
+        let page = pageData["page"];
+        if (page !== undefined && page !== 1) {
+            submitPageSearch(page - 1);
         }
-        submitPageSearch(initPage)
     }
 
     return (
