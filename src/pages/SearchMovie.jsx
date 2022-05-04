@@ -99,7 +99,7 @@ const SearchMovie = () => {
     const navigate = useNavigate();
 
     const {
-        accessToken
+        accessToken, setAccessToken
     } = useUser();
 
     const {register, getValues, setValue, handleSubmit} = useForm();
@@ -130,6 +130,11 @@ const SearchMovie = () => {
         }
     }
 
+    const handleException = (error) => {
+        setAccessToken(null);
+        navigate("/login");
+    }
+
     const submitSearch = () => {
         const payLoad = {}
 
@@ -141,7 +146,7 @@ const SearchMovie = () => {
 
         search_backend(payLoad, accessToken)
             .then(response => handleResultSuccess(payLoad, response))
-            .catch(error => navigate("/login"))
+            .catch(error => handleException(error))
     }
 
     const submitPageSearch = (targetPage) => {
@@ -155,7 +160,7 @@ const SearchMovie = () => {
         
         search_backend(payLoad, accessToken)
             .then(response => handlePageResultSuccess(payLoad, response))
-            .catch(error => navigate("/login"))
+            .catch(error => handleException(error))
     }
 
     const nextPage = () => {
