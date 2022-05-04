@@ -33,7 +33,7 @@ const Content = () => {
                 {!accessToken && <Route path="/register" element={<Register/>}/>}
                 {!accessToken && <Route path="/login" element={<Login/>}/>}
                 {!!accessToken && <Route path="/movies/search" element={<SearchMovie/>}/>}
-                {!!accessToken && <Route path="/" element={<Home/>}/>}
+                {!accessToken ? <Route path="/" element={<Login/>}/> : <Route path="/" element={<Home/>}/>}
             </Routes>
         </StyledDiv>
     );
