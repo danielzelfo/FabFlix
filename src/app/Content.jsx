@@ -1,5 +1,6 @@
 import React from "react";
 import {Route, Routes} from "react-router-dom";
+import {useUser} from "hook/User";
 
 import SearchMovie from "pages/SearchMovie";
 import Register from "pages/Register";
@@ -20,35 +21,19 @@ const StyledDiv = styled.div`
   box-shadow: inset 0 3px 5px -3px #000000;
 `
 
-/**
- * This is the Component that will switch out what Component is being shown
- * depending on the "url" of the page
- * <br>
- * You'll notice that we have a <Routes> Component and inside it, we have
- * multiple <Route> components. Each <Route> maps a specific "url" to show a
- * specific Component.
- * <br>
- * Whenever you add a Route here make sure to add a corresponding NavLink in
- * the NavBar Component.
- * <br>
- * You can essentially think of this as a switch statement:
- * @example
- * switch (url) {
- *     case "/login":
- *         return <Login/>;
- *     case "/":
- *         return <Home/>;
- * }
- *
- */
 const Content = () => {
+
+    const {
+        accessToken
+    } = useUser();
+
     return (
         <StyledDiv>
             <Routes>
-                <Route path="/register" element={<Register/>}/>
-                <Route path="/login" element={<Login/>}/>
-                <Route path="/movies/search" element={<SearchMovie/>}/>
-                <Route path="/" element={<Home/>}/>
+                {!accessToken && <Route path="/register" element={<Register/>}/>}
+                {!accessToken && <Route path="/login" element={<Login/>}/>}
+                {!!accessToken && <Route path="/movies/search" element={<SearchMovie/>}/>}
+                {!!accessToken && <Route path="/" element={<Home/>}/>}
             </Routes>
         </StyledDiv>
     );

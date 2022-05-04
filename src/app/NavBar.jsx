@@ -1,16 +1,16 @@
 import React from "react";
 import {NavLink} from "react-router-dom";
 import styled from "styled-components";
+import {useUser} from "hook/User";
+import { useNavigate } from "react-router-dom";
 
 const StyledNav = styled.nav`
   display: flex;
   justify-content: center;
-
-  width: calc(100% - 10px);
+  width: calc(100% - 40px);
   height: 50px;
   position: relative;
   left: 5px;
-
   background-color: #fff;
 `;
 
@@ -21,32 +21,63 @@ const StyledNavLink = styled(NavLink)`
   text-decoration: none;
 `;
 
-/**
- * To be able to navigate around the website we have these NavLink's (Notice
- * that they are "styled" NavLink's that are now named StyledNavLink)
- * <br>
- * Whenever you add a NavLink here make sure to add a corresponding Route in
- * the Content Component
- * <br>
- * You can add as many Link as you would like here to allow for better navigation
- * <br>
- * Below we have two Links:
- * <li>Home - A link that will change the url of the page to "/"
- * <li>Login - A link that will change the url of the page to "/login"
- */
+
+const MainNav = styled.div`
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    display: flex;
+    justify-content: center;
+    width: calc(100% - 10px);
+`
+
+const LogoutButton = styled.button`
+    margin-left: 5px;
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 7.5px;
+    max-width: 40px;
+    &:hover {
+        background-color: black;
+        color: white;
+    }
+`
+
 const NavBar = () => {
+    const navigate = useNavigate();
+
+    const {
+        accessToken, setAccessToken
+    } = useUser();
+
+    const logoutUser = () => {
+        setAccessToken(null);
+        navigate("/login");
+    }
+
     return (
-        <StyledNav>
-            <StyledNavLink to="/">
-                Home
-            </StyledNavLink>
-            <StyledNavLink to="/login">
-                Login
-            </StyledNavLink>
-            <StyledNavLink to="/register">
-                Register
-            </StyledNavLink>
-        </StyledNav>
+        <MainNav>
+            <StyledNav>
+                {!!accessToken && 
+                    <StyledNavLink to="/">
+                        Home
+                    </StyledNavLink>
+                }
+                {!accessToken && 
+                    <StyledNavLink to="/login">
+                        Login
+                    </StyledNavLink>
+                }
+                {!accessToken && 
+                    <StyledNavLink to="/register">
+                        Register
+                    </StyledNavLink>
+                }
+            </StyledNav>
+            {!!accessToken && 
+                <LogoutButton onClick={logoutUser}>log out</LogoutButton>
+            }
+        </MainNav>
     );
 }
 

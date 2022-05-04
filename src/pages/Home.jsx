@@ -18,7 +18,6 @@ const MapDiv = styled.div`
 const Home = () => {
     return (
         <MainDiv>
-            <h1>Home</h1>
             <MapDiv>
                 <li>
                     <ol><Link to="/movies/search">Search for movies</Link></ol>
