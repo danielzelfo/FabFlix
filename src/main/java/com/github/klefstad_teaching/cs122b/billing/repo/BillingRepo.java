@@ -38,4 +38,20 @@ public class BillingRepo
             throw new ResultError(BillingResults.CART_ITEM_EXISTS);
         }
     }
+
+    public void updateCart(Integer userId, MovieRequest movieRequest) {
+        String sql =
+                "UPDATE billing.cart " +
+                "SET quantity = :quantity " +
+                "WHERE user_id = :user_id AND  movie_id = :movie_id;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("user_id", userId, Types.INTEGER)
+                        .addValue("movie_id", movieRequest.getMovieId(), Types.INTEGER)
+                        .addValue("quantity", movieRequest.getQuantity(), Types.INTEGER);
+
+        if (this.template.update(sql, source) == 0)
+            throw new ResultError(BillingResults.CART_ITEM_DOES_NOT_EXIST);
+    }
 }

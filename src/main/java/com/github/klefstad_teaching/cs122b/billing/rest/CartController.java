@@ -33,7 +33,7 @@ public class CartController
     }
 
     @PostMapping("/cart/insert")
-    public ResponseEntity<BasicResponse> endpoint(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest)
+    public ResponseEntity<BasicResponse> insertCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest)
     {
         Integer userId;
         try {
@@ -52,5 +52,27 @@ public class CartController
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BasicResponse()
                         .setResult(BillingResults.CART_ITEM_INSERTED));
+    }
+
+    @PostMapping("/cart/update")
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest)
+    {
+        Integer userId;
+        try {
+            userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        if (movieRequest.getQuantity() == null || movieRequest.getQuantity() < 1)
+            throw new ResultError(BillingResults.INVALID_QUANTITY);
+        else if (movieRequest.getQuantity() > 10)
+            throw new ResultError(BillingResults.MAX_QUANTITY);
+
+        this.repo.updateCart(userId, movieRequest);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new BasicResponse()
+                        .setResult(BillingResults.CART_ITEM_UPDATED));
     }
 }
