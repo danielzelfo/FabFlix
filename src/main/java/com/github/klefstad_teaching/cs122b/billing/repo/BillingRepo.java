@@ -54,4 +54,18 @@ public class BillingRepo
         if (this.template.update(sql, source) == 0)
             throw new ResultError(BillingResults.CART_ITEM_DOES_NOT_EXIST);
     }
+
+    public void deleteFromCart(Integer userId, Long movieId) {
+        String sql =
+            "DELETE FROM billing.cart " +
+            "WHERE user_id = :user_id AND  movie_id = :movie_id;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("user_id", userId, Types.INTEGER)
+                        .addValue("movie_id", movieId, Types.INTEGER);
+
+        if (this.template.update(sql, source) == 0)
+            throw new ResultError(BillingResults.CART_ITEM_DOES_NOT_EXIST);
+    }
 }
