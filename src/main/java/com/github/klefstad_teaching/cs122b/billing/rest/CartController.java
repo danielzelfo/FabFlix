@@ -2,7 +2,9 @@ package com.github.klefstad_teaching.cs122b.billing.rest;
 
 import com.github.klefstad_teaching.cs122b.billing.model.request.MovieRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.response.BasicResponse;
+import com.github.klefstad_teaching.cs122b.billing.model.response.CartResponse;
 import com.github.klefstad_teaching.cs122b.billing.repo.BillingRepo;
+import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
 import com.github.klefstad_teaching.cs122b.billing.util.Validate;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.BillingResults;
@@ -13,20 +15,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.*;
 
 
+import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.List;
 
 @RestController
 public class CartController
 {
     private final BillingRepo repo;
-    private final Validate    validate;
+    private final Validate validate;
 
     @Autowired
     public CartController(BillingRepo repo, Validate validate)
@@ -94,5 +94,43 @@ public class CartController
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BasicResponse()
                         .setResult(BillingResults.CART_ITEM_DELETED));
+    }
+
+    @GetMapping("/cart/retrieve")
+    public ResponseEntity<CartResponse> retreiveCart(@AuthenticationPrincipal SignedJWT user) {
+        Integer userId;
+        List<String> roles;
+        try {
+            userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
+            roles = user.getJWTClaimsSet().getStringListClaim(JWTManager.CLAIM_ROLES);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        Item[] cartItems = this.repo.retreiveUserCart(userId);
+        if (cartItems.length == 0) {
+            throw new ResultError(BillingResults.CART_EMPTY);
+        }
+
+        BigDecimal total = BigDecimal.ZERO;
+        for (Item cartItem : cartItems) {
+
+            if (roles.contains("PREMIUM")) {
+                cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
+            } else {
+                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
+            }
+            cartItem.setPremiumDiscount(null); // remove discount attribute
+
+            total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+        }
+        total = total.setScale(2);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CartResponse()
+                        .setResult(BillingResults.CART_RETRIEVED)
+                        .setItems(cartItems)
+                        .setTotal(total));
+
     }
 }
