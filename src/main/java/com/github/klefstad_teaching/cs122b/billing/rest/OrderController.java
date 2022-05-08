@@ -1,5 +1,6 @@
 package com.github.klefstad_teaching.cs122b.billing.rest;
 
+import com.github.klefstad_teaching.cs122b.billing.model.request.PaymentIntentRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.response.BasicResponse;
 import com.github.klefstad_teaching.cs122b.billing.model.response.PaymentResponse;
 import com.github.klefstad_teaching.cs122b.billing.repo.BillingRepo;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
@@ -54,4 +56,20 @@ public class OrderController
                         .setClientSecret(paymentIntent.getClientSecret()));
     }
 
+    @PostMapping("/order/complete")
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody PaymentIntentRequest paymentIntentRequest)
+    {
+        Integer userId;
+        try {
+            userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        this.repo.completeOrder(userId, paymentIntentRequest);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new BasicResponse()
+                        .setResult(BillingResults.ORDER_COMPLETED));
+    }
 }

@@ -3,6 +3,7 @@ package com.github.klefstad_teaching.cs122b.billing.repo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.klefstad_teaching.cs122b.billing.model.request.MovieRequest;
+import com.github.klefstad_teaching.cs122b.billing.model.request.PaymentIntentRequest;
 import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.BillingResults;
@@ -17,7 +18,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -181,5 +184,75 @@ public class BillingRepo
         } catch( StripeException exc ) {
             throw new ResultError(BillingResults.STRIPE_ERROR);
         }
+    }
+
+    private void recordSale(Integer userId, BigDecimal total) {
+        String sql = "INSERT INTO billing.sale (user_id, total) " +
+                "VALUES (:user_id, :total);";
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("user_id", userId, Types.INTEGER)
+                        .addValue("total", total, Types.DECIMAL);
+        this.template.update(sql, source);
+    }
+
+    private Integer getPreviousUserSaleId(Integer userId) {
+        // note: this must run after recordSale
+        String sql = "SELECT id FROM billing.sale " +
+                "WHERE user_id = :user_id " +
+                "ORDER BY id DESC LIMIT 1;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("user_id", userId, Types.INTEGER);
+
+        return this.template.queryForObject(sql, source, (rs, rowNum)->rs.getInt(1));
+    }
+
+    private void recordItemsSale(Integer userId) {
+        Item[] cartItems = retrieveUserCart(userId);
+
+        Integer saleId = getPreviousUserSaleId(userId);
+
+        String sql = "INSERT INTO billing.sale_item (sale_id, movie_id, quantity) " +
+                "VALUES (:sale_id, :movie_id, :quantity);";
+
+        for (Item cartItem : cartItems) {
+            this.template.update(sql, new MapSqlParameterSource()
+                    .addValue("sale_id", saleId, Types.INTEGER)
+                    .addValue("movie_id", cartItem.getMovieId(), Types.INTEGER)
+                    .addValue("quantity", cartItem.getQuantity(), Types.INTEGER));
+        }
+
+    }
+
+    public void completeOrder(Integer userId, PaymentIntentRequest paymentIntentRequest) {
+        PaymentIntent retrievedPaymentIntent;
+        try {
+            retrievedPaymentIntent = PaymentIntent.retrieve(paymentIntentRequest.getPaymentIntentId());
+        } catch (StripeException exc ) {
+            throw new ResultError(BillingResults.STRIPE_ERROR);
+        }
+
+        String retrievedUserId = retrievedPaymentIntent.getMetadata().get("userId");
+
+        if (!retrievedUserId.equals(Integer.toString(userId))) {
+            throw new ResultError(BillingResults.ORDER_CANNOT_COMPLETE_WRONG_USER);
+        }
+
+        String status = retrievedPaymentIntent.getStatus();
+
+        if (!status.equals("succeeded")) {
+            throw new ResultError(BillingResults.ORDER_CANNOT_COMPLETE_NOT_SUCCEEDED);
+        }
+
+        BigDecimal total = BigDecimal.valueOf(retrievedPaymentIntent.getAmount()).divide(BigDecimal.valueOf(100)).setScale(2);
+
+        recordSale(userId, total);
+
+        recordItemsSale(userId);
+
+        clearCart(userId);
+
     }
 }

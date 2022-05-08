@@ -13,7 +13,7 @@ CREATE TABLE `billing`.`sale` (
     `id`	INT	NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `user_id`	INT	NOT NULL,
     `total` DECIMAL(19,4)	NOT NULL,
-    `order_date`	TIMESTAMP	NOT NULL,
+    `order_date`	TIMESTAMP	NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (`user_id`) REFERENCES `idm`.`user` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
