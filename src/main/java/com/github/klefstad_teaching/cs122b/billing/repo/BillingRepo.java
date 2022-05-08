@@ -18,8 +18,8 @@ import java.sql.Types;
 @Component
 public class BillingRepo
 {
-    private NamedParameterJdbcTemplate template;
-    private ObjectMapper objectMapper;
+    private final NamedParameterJdbcTemplate template;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public BillingRepo(NamedParameterJdbcTemplate template, ObjectMapper objectMapper)
@@ -75,7 +75,7 @@ public class BillingRepo
             throw new ResultError(BillingResults.CART_ITEM_DOES_NOT_EXIST);
     }
 
-    public Item[] retreiveUserCart(Integer userId) {
+    public Item[] retrieveUserCart(Integer userId) {
         MapSqlParameterSource source =
                 new MapSqlParameterSource();
 
@@ -103,5 +103,18 @@ public class BillingRepo
             //this shouldn't happen
             return new Item[0];
         }
+    }
+
+    public void clearCart(Integer userId) {
+        String sql =
+                "DELETE FROM billing.cart " +
+                "WHERE user_id = :user_id;";
+
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("user_id", userId, Types.INTEGER);
+
+        if (this.template.update(sql, source) == 0)
+            throw new ResultError(BillingResults.CART_EMPTY);
     }
 }

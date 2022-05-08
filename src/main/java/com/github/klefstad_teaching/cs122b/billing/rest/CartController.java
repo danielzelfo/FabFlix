@@ -107,7 +107,7 @@ public class CartController
             throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
         }
 
-        Item[] cartItems = this.repo.retreiveUserCart(userId);
+        Item[] cartItems = this.repo.retrieveUserCart(userId);
         if (cartItems.length == 0) {
             throw new ResultError(BillingResults.CART_EMPTY);
         }
@@ -132,5 +132,23 @@ public class CartController
                         .setItems(cartItems)
                         .setTotal(total));
 
+    }
+
+
+    @PostMapping("/cart/clear")
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user)
+    {
+        Integer userId;
+        try {
+            userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        this.repo.clearCart(userId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new BasicResponse()
+                        .setResult(BillingResults.CART_CLEARED));
     }
 }
