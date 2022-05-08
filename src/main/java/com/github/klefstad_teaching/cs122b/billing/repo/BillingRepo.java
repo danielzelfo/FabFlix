@@ -145,8 +145,6 @@ public class BillingRepo
     }
 
     public PaymentIntent orderPayment(Integer userId, List<String> roles) {
-
-
         Item[] cartItems = retrieveUserCart(userId);
         if (cartItems.length == 0) {
             throw new ResultError(BillingResults.CART_EMPTY);
@@ -154,17 +152,23 @@ public class BillingRepo
 
         BigDecimal total = BigDecimal.ZERO;
         String description = "";
-        for (Item cartItem : cartItems) {
-            description += cartItem.getMovieTitle() + ", ";
-            if (roles.contains("PREMIUM")) {
-                cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
-            } else {
-                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
-            }
-            cartItem.setPremiumDiscount(null); // remove discount attribute
 
-            total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+        if (roles.contains("PREMIUM")) {
+            for (Item cartItem : cartItems) {
+                description += cartItem.getMovieTitle() + ", ";
+                cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
+                cartItem.setPremiumDiscount(null); // remove discount attribute
+                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+            }
+        } else {
+            for (Item cartItem : cartItems) {
+                description += cartItem.getMovieTitle() + ", ";
+                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
+                cartItem.setPremiumDiscount(null); // remove discount attribute
+                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+            }
         }
+
         total = total.setScale(2);
         description = description.substring(0, description.length() - 2); // remove extra ", "
 

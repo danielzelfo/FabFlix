@@ -113,17 +113,20 @@ public class CartController
         }
 
         BigDecimal total = BigDecimal.ZERO;
-        for (Item cartItem : cartItems) {
-
-            if (roles.contains("PREMIUM")) {
+        if (roles.contains("PREMIUM")) {
+            for (Item cartItem : cartItems) {
                 cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
-            } else {
-                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
+                cartItem.setPremiumDiscount(null); // remove discount attribute
+                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             }
-            cartItem.setPremiumDiscount(null); // remove discount attribute
-
-            total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+        } else {
+            for (Item cartItem : cartItems) {
+                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
+                cartItem.setPremiumDiscount(null); // remove discount attribute
+                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
+            }
         }
+
         total = total.setScale(2);
 
         return ResponseEntity.status(HttpStatus.OK)
