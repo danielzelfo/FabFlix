@@ -1,9 +1,7 @@
 package com.github.klefstad_teaching.cs122b.billing.repo.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.math.BigDecimal;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Item {
     private BigDecimal unitPrice;
     private Integer quantity;
@@ -11,7 +9,6 @@ public class Item {
     private String movieTitle;
     private String backdropPath;
     private String posterPath;
-    private Integer premiumDiscount;
 
     public BigDecimal getUnitPrice() {
         return unitPrice;
@@ -64,15 +61,6 @@ public class Item {
 
     public Item setPosterPath(String posterPath) {
         this.posterPath = posterPath;
-        return this;
-    }
-
-    public Integer getPremiumDiscount() {
-        return premiumDiscount;
-    }
-
-    public Item setPremiumDiscount(Integer premiumDiscount) {
-        this.premiumDiscount = premiumDiscount;
         return this;
     }
 }
