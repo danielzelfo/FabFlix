@@ -21,20 +21,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
 @RestController
-public class OrderController
-{
+public class OrderController {
     private final BillingRepo repo;
-    private final Validate    validate;
+    private final Validate validate;
 
     @Autowired
-    public OrderController(BillingRepo repo,Validate validate)
-    {
+    public OrderController(BillingRepo repo, Validate validate) {
         this.repo = repo;
         this.validate = validate;
     }
@@ -60,8 +57,7 @@ public class OrderController
     }
 
     @PostMapping("/order/complete")
-    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody PaymentIntentRequest paymentIntentRequest)
-    {
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody PaymentIntentRequest paymentIntentRequest) {
         Integer userId;
         try {
             userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
@@ -107,26 +103,16 @@ public class OrderController
             throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
         }
 
-        Item[] orderItems = this.repo.getOrderItems(userId, saleId);
+        Item[] orderItems = this.repo.getOrderItems(userId, saleId, roles);
         if (orderItems.length == 0) {
             throw new ResultError(BillingResults.ORDER_DETAIL_NOT_FOUND);
         }
 
+        // calculate total
         BigDecimal total = BigDecimal.ZERO;
-        if (roles.contains("PREMIUM")) {
-            for (Item orderItem : orderItems) {
-                orderItem.setUnitPrice(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - orderItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
-                orderItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
-            }
-        } else {
-            for (Item orderItem : orderItems) {
-                orderItem.setUnitPrice(orderItem.getUnitPrice().setScale(2));
-                orderItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
-            }
+        for (Item orderItem : orderItems) {
+            total = total.add(orderItem.getUnitPrice().multiply(BigDecimal.valueOf(orderItem.getQuantity())));
         }
-
         total = total.setScale(2);
 
         return ResponseEntity.status(HttpStatus.OK)

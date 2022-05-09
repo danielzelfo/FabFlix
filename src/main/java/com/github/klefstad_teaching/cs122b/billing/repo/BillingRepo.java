@@ -1,7 +1,5 @@
 package com.github.klefstad_teaching.cs122b.billing.repo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.klefstad_teaching.cs122b.billing.model.request.MovieRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.request.PaymentIntentRequest;
 import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
@@ -13,27 +11,24 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
-import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 
 @Component
-public class BillingRepo
-{
+public class BillingRepo {
     private final NamedParameterJdbcTemplate template;
-    private final ObjectMapper objectMapper;
 
     @Autowired
-    public BillingRepo(NamedParameterJdbcTemplate template, ObjectMapper objectMapper)
-    {
+    public BillingRepo(NamedParameterJdbcTemplate template) {
         this.template = template;
-        this.objectMapper = objectMapper;
     }
 
     public void addToCart(Integer userId, MovieRequest movieRequest) {
@@ -56,8 +51,8 @@ public class BillingRepo
     public void updateCart(Integer userId, MovieRequest movieRequest) {
         String sql =
                 "UPDATE billing.cart " +
-                "SET quantity = :quantity " +
-                "WHERE user_id = :user_id AND  movie_id = :movie_id;";
+                        "SET quantity = :quantity " +
+                        "WHERE user_id = :user_id AND  movie_id = :movie_id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
@@ -71,8 +66,8 @@ public class BillingRepo
 
     public void deleteFromCart(Integer userId, Long movieId) {
         String sql =
-            "DELETE FROM billing.cart " +
-            "WHERE user_id = :user_id AND  movie_id = :movie_id;";
+                "DELETE FROM billing.cart " +
+                        "WHERE user_id = :user_id AND  movie_id = :movie_id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
@@ -83,40 +78,50 @@ public class BillingRepo
             throw new ResultError(BillingResults.CART_ITEM_DOES_NOT_EXIST);
     }
 
-    public Item[] retrieveUserCart(Integer userId) {
-        MapSqlParameterSource source =
-                new MapSqlParameterSource();
+    private Item defaultItem(ResultSet rs) throws SQLException {
+        return new Item()
+                .setQuantity(rs.getInt("quantity"))
+                .setMovieId(rs.getLong("movieId"))
+                .setMovieTitle(rs.getString("movieTitle"))
+                .setBackdropPath(rs.getString("backdropPath"))
+                .setPosterPath(rs.getString("posterPath"));
+    }
 
-        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT( 'unitPrice', mp.unit_price, 'quantity', c.quantity, 'movieId', c.movie_id, 'movieTitle', m.title, 'backdropPath', m.backdrop_path, 'posterPath', m.poster_path, 'premiumDiscount', mp.premium_discount )) " +
+    private Item adjustedItem(ResultSet rs, List<String> roles) throws SQLException {
+        return roles.contains("PREMIUM") ?
+                defaultItem(rs).setUnitPrice(rs.getBigDecimal("unitPrice").multiply(BigDecimal.valueOf(1 - rs.getInt("premiumDiscount") / 100.0)).setScale(2, BigDecimal.ROUND_DOWN))
+                :
+                defaultItem(rs).setUnitPrice(rs.getBigDecimal("unitPrice").setScale(2));
+    }
+
+    private Item[] itemQuery(String sql, MapSqlParameterSource source, List<String> roles) {
+        return this.template.query(
+                sql,
+                source,
+                (rs, rowNum) -> adjustedItem(rs, roles)
+        ).toArray(new Item[0]);
+    }
+
+    private Item[] retrieveUserCart(Integer userId) {
+        return retrieveUserCart(userId, Collections.emptyList());
+    }
+
+    public Item[] retrieveUserCart(Integer userId, List<String> roles) {
+        MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("user_id", userId, Types.INTEGER);
+        String sql = "SELECT mp.unit_price AS unitPrice, c.quantity, c.movie_id AS movieId, m.title AS movieTitle, m.backdrop_path AS backdropPath, m.poster_path AS posterPath, mp.premium_discount AS premiumDiscount " +
                 "FROM billing.cart c " +
                 "JOIN billing.movie_price mp ON c.movie_id = mp.movie_id " +
                 "JOIN movies.movie m ON c.movie_id = m.id " +
                 "WHERE c.user_id = :user_id;";
-        source.addValue("user_id", userId, Types.INTEGER);
 
-        String jsonArrayString = "";
-        try {
-            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
-        } catch (EmptyResultDataAccessException exc ) {
-            //this shouldn't happen
-            return new Item[0];
-        }
-        if (jsonArrayString == null) {
-            return new Item[0];
-        }
-
-        try {
-            return this.objectMapper.readValue(jsonArrayString, Item[].class);
-        } catch( JsonProcessingException exc ) {
-            //this shouldn't happen
-            return new Item[0];
-        }
+        return itemQuery(sql, source, roles);
     }
 
     public void clearCart(Integer userId) {
         String sql =
                 "DELETE FROM billing.cart " +
-                "WHERE user_id = :user_id;";
+                        "WHERE user_id = :user_id;";
 
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
@@ -126,7 +131,7 @@ public class BillingRepo
             throw new ResultError(BillingResults.CART_EMPTY);
     }
 
-    private PaymentIntent processPaymentIntent(Long amountInTotalCents, String description, String userId ) throws StripeException {
+    private PaymentIntent processPaymentIntent(Long amountInTotalCents, String description, String userId) throws StripeException {
         PaymentIntentCreateParams paymentIntentCreateParams =
                 PaymentIntentCreateParams
                         .builder()
@@ -148,30 +153,18 @@ public class BillingRepo
     }
 
     public PaymentIntent orderPayment(Integer userId, List<String> roles) {
-        Item[] cartItems = retrieveUserCart(userId);
+        Item[] cartItems = retrieveUserCart(userId, roles);
         if (cartItems.length == 0) {
             throw new ResultError(BillingResults.CART_EMPTY);
         }
 
+        // calculate total and generate description
         BigDecimal total = BigDecimal.ZERO;
         String description = "";
-
-        if (roles.contains("PREMIUM")) {
-            for (Item cartItem : cartItems) {
-                description += cartItem.getMovieTitle() + ", ";
-                cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
-                cartItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-            }
-        } else {
-            for (Item cartItem : cartItems) {
-                description += cartItem.getMovieTitle() + ", ";
-                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
-                cartItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-            }
+        for (Item cartItem : cartItems) {
+            description += cartItem.getMovieTitle() + ", ";
+            total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
         }
-
         total = total.setScale(2);
         description = description.substring(0, description.length() - 2); // remove extra ", "
 
@@ -181,7 +174,7 @@ public class BillingRepo
 
         try {
             return processPaymentIntent(amountInCents, description, userIdStr);
-        } catch( StripeException exc ) {
+        } catch (StripeException exc) {
             throw new ResultError(BillingResults.STRIPE_ERROR);
         }
     }
@@ -206,7 +199,7 @@ public class BillingRepo
                 new MapSqlParameterSource()
                         .addValue("user_id", userId, Types.INTEGER);
 
-        return this.template.queryForObject(sql, source, (rs, rowNum)->rs.getInt(1));
+        return this.template.queryForObject(sql, source, (rs, rowNum) -> rs.getInt(1));
     }
 
     private void recordItemsSale(Integer userId) {
@@ -223,25 +216,22 @@ public class BillingRepo
                     .addValue("movie_id", cartItem.getMovieId(), Types.INTEGER)
                     .addValue("quantity", cartItem.getQuantity(), Types.INTEGER));
         }
-
     }
 
     public void completeOrder(Integer userId, PaymentIntentRequest paymentIntentRequest) {
         PaymentIntent retrievedPaymentIntent;
         try {
             retrievedPaymentIntent = PaymentIntent.retrieve(paymentIntentRequest.getPaymentIntentId());
-        } catch (StripeException exc ) {
+        } catch (StripeException exc) {
             throw new ResultError(BillingResults.STRIPE_ERROR);
         }
 
         String retrievedUserId = retrievedPaymentIntent.getMetadata().get("userId");
-
         if (!retrievedUserId.equals(Integer.toString(userId))) {
             throw new ResultError(BillingResults.ORDER_CANNOT_COMPLETE_WRONG_USER);
         }
 
         String status = retrievedPaymentIntent.getStatus();
-
         if (!status.equals("succeeded")) {
             throw new ResultError(BillingResults.ORDER_CANNOT_COMPLETE_NOT_SUCCEEDED);
         }
@@ -249,11 +239,8 @@ public class BillingRepo
         BigDecimal total = BigDecimal.valueOf(retrievedPaymentIntent.getAmount()).divide(BigDecimal.valueOf(100)).setScale(2);
 
         recordSale(userId, total);
-
         recordItemsSale(userId);
-
         clearCart(userId);
-
     }
 
     public Order[] getRecentUserOrders(Integer userId) {
@@ -266,51 +253,29 @@ public class BillingRepo
                 "ORDER BY id DESC LIMIT 5;";
         source.addValue("user_id", userId, Types.INTEGER);
 
-        List<Order> orders =
-                this.template.query(
-                        sql,
-                        source,
+        return this.template.query(
+                sql,
+                source,
 
-                        (rs, rowNum) ->
-                                new Order()
-                                        .setSaleId(rs.getLong("id"))
-                                        .setTotal(rs.getBigDecimal("total").setScale(2))
-                                        .setOrderDate(rs.getTimestamp("order_date").toInstant())
-                );
-
-        //return as array
-        return orders.toArray(new Order[0]);
+                (rs, rowNum) ->
+                        new Order()
+                                .setSaleId(rs.getLong("id"))
+                                .setTotal(rs.getBigDecimal("total").setScale(2))
+                                .setOrderDate(rs.getTimestamp("order_date").toInstant())
+        ).toArray(new Order[0]);
     }
 
-    public Item[] getOrderItems(Integer userId, Long saleId) {
-        MapSqlParameterSource source =
-                new MapSqlParameterSource()
-                        .addValue("sale_id", saleId, Types.INTEGER)
-                        .addValue("user_id", userId, Types.INTEGER);
-
-        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT( 'unitPrice', mp.unit_price, 'quantity', si.quantity, 'movieId', si.movie_id, 'movieTitle', m.title, 'backdropPath', m.backdrop_path, 'posterPath', m.poster_path, 'premiumDiscount', mp.premium_discount )) " +
+    public Item[] getOrderItems(Integer userId, Long saleId, List<String> roles) {
+        MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("user_id", userId, Types.INTEGER)
+                .addValue("sale_id", saleId, Types.INTEGER);
+        String sql = "SELECT mp.unit_price AS unitPrice, si.quantity, si.movie_id AS movieId, m.title AS movieTitle, m.backdrop_path AS backdropPath, m.poster_path AS posterPath, mp.premium_discount AS premiumDiscount " +
                 "FROM billing.sale_item si " +
                 "JOIN billing.sale s ON s.id = si.sale_id " +
                 "JOIN billing.movie_price mp ON si.movie_id = mp.movie_id " +
                 "JOIN movies.movie m ON si.movie_id = m.id " +
                 "WHERE si.sale_id = :sale_id AND s.user_id = :user_id;";
 
-        String jsonArrayString = "";
-        try {
-            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
-        } catch (EmptyResultDataAccessException exc ) {
-            //this shouldn't happen
-            return new Item[0];
-        }
-        if (jsonArrayString == null) {
-            return new Item[0];
-        }
-
-        try {
-            return this.objectMapper.readValue(jsonArrayString, Item[].class);
-        } catch( JsonProcessingException exc ) {
-            //this shouldn't happen
-            return new Item[0];
-        }
+        return itemQuery(sql, source, roles);
     }
 }

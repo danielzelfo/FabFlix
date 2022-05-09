@@ -2,7 +2,6 @@ package com.github.klefstad_teaching.cs122b.billing.model.response;
 
 import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
 import com.github.klefstad_teaching.cs122b.core.result.Result;
-
 import java.math.BigDecimal;
 
 public class ItemListResponse {

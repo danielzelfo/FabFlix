@@ -17,27 +17,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.List;
 
 @RestController
-public class CartController
-{
+public class CartController {
     private final BillingRepo repo;
     private final Validate validate;
 
     @Autowired
-    public CartController(BillingRepo repo, Validate validate)
-    {
+    public CartController(BillingRepo repo, Validate validate) {
         this.repo = repo;
         this.validate = validate;
     }
 
     @PostMapping("/cart/insert")
-    public ResponseEntity<BasicResponse> insertCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest)
-    {
+    public ResponseEntity<BasicResponse> insertCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest) {
         Integer userId;
         try {
             userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
@@ -58,8 +54,7 @@ public class CartController
     }
 
     @PostMapping("/cart/update")
-    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest)
-    {
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @RequestBody MovieRequest movieRequest) {
         Integer userId;
         try {
             userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
@@ -80,8 +75,7 @@ public class CartController
     }
 
     @DeleteMapping("/cart/delete/{movieId}")
-    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @PathVariable Long movieId)
-    {
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user, @PathVariable Long movieId) {
         Integer userId;
         try {
             userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
@@ -107,26 +101,16 @@ public class CartController
             throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
         }
 
-        Item[] cartItems = this.repo.retrieveUserCart(userId);
+        Item[] cartItems = this.repo.retrieveUserCart(userId, roles);
         if (cartItems.length == 0) {
             throw new ResultError(BillingResults.CART_EMPTY);
         }
 
+        // calculate total
         BigDecimal total = BigDecimal.ZERO;
-        if (roles.contains("PREMIUM")) {
-            for (Item cartItem : cartItems) {
-                cartItem.setUnitPrice(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(1 - cartItem.getPremiumDiscount()/100.0)).setScale(2, BigDecimal.ROUND_DOWN));
-                cartItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-            }
-        } else {
-            for (Item cartItem : cartItems) {
-                cartItem.setUnitPrice(cartItem.getUnitPrice().setScale(2));
-                cartItem.setPremiumDiscount(null); // remove discount attribute
-                total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-            }
+        for (Item cartItem : cartItems) {
+            total = total.add(cartItem.getUnitPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
         }
-
         total = total.setScale(2);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -139,8 +123,7 @@ public class CartController
 
 
     @PostMapping("/cart/clear")
-    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user)
-    {
+    public ResponseEntity<BasicResponse> updateCart(@AuthenticationPrincipal SignedJWT user) {
         Integer userId;
         try {
             userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);

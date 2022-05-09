@@ -1,7 +1,6 @@
 package com.github.klefstad_teaching.cs122b.billing.repo.entity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
 import java.math.BigDecimal;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
