@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.klefstad_teaching.cs122b.billing.model.request.MovieRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.request.PaymentIntentRequest;
 import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
+import com.github.klefstad_teaching.cs122b.billing.repo.entity.Order;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.BillingResults;
 import com.stripe.exception.StripeException;
@@ -18,7 +19,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.util.List;
@@ -254,5 +254,31 @@ public class BillingRepo
 
         clearCart(userId);
 
+    }
+
+    public Order[] getRecentUserOrders(Integer userId) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource();
+
+        String sql = "SELECT id, total, order_date " +
+                "FROM billing.sale " +
+                "WHERE user_id = :user_id " +
+                "ORDER BY id DESC LIMIT 5;";
+        source.addValue("user_id", userId, Types.INTEGER);
+
+        List<Order> orders =
+                this.template.query(
+                        sql,
+                        source,
+
+                        (rs, rowNum) ->
+                                new Order()
+                                        .setSaleId(rs.getLong("id"))
+                                        .setTotal(rs.getBigDecimal("total"))
+                                        .setOrderDate(rs.getTimestamp("order_date").toInstant())
+                );
+
+        //return as array
+        return orders.toArray(new Order[0]);
     }
 }

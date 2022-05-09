@@ -3,7 +3,9 @@ package com.github.klefstad_teaching.cs122b.billing.rest;
 import com.github.klefstad_teaching.cs122b.billing.model.request.PaymentIntentRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.response.BasicResponse;
 import com.github.klefstad_teaching.cs122b.billing.model.response.PaymentResponse;
+import com.github.klefstad_teaching.cs122b.billing.model.response.SalesResponse;
 import com.github.klefstad_teaching.cs122b.billing.repo.BillingRepo;
+import com.github.klefstad_teaching.cs122b.billing.repo.entity.Order;
 import com.github.klefstad_teaching.cs122b.billing.util.Validate;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.BillingResults;
@@ -71,5 +73,25 @@ public class OrderController
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new BasicResponse()
                         .setResult(BillingResults.ORDER_COMPLETED));
+    }
+
+    @GetMapping("/order/list")
+    public ResponseEntity<SalesResponse> listOrders(@AuthenticationPrincipal SignedJWT user) {
+        Integer userId;
+        try {
+            userId = user.getJWTClaimsSet().getIntegerClaim(JWTManager.CLAIM_ID);
+        } catch (ParseException exc) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
+
+        Order[] userOrders = this.repo.getRecentUserOrders(userId);
+        if (userOrders.length == 0) {
+            throw new ResultError(BillingResults.ORDER_LIST_NO_SALES_FOUND);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new SalesResponse()
+                        .setResult(BillingResults.ORDER_LIST_FOUND_SALES)
+                        .setSales(userOrders));
     }
 }
