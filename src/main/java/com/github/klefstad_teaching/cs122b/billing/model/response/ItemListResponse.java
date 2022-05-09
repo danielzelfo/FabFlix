@@ -5,7 +5,7 @@ import com.github.klefstad_teaching.cs122b.core.result.Result;
 
 import java.math.BigDecimal;
 
-public class CartResponse {
+public class ItemListResponse {
     private Result result;
     private BigDecimal total;
     private Item[] items;
@@ -14,7 +14,7 @@ public class CartResponse {
         return result;
     }
 
-    public CartResponse setResult(Result result) {
+    public ItemListResponse setResult(Result result) {
         this.result = result;
         return this;
     }
@@ -23,7 +23,7 @@ public class CartResponse {
         return total;
     }
 
-    public CartResponse setTotal(BigDecimal total) {
+    public ItemListResponse setTotal(BigDecimal total) {
         this.total = total;
         return this;
     }
@@ -32,7 +32,7 @@ public class CartResponse {
         return items;
     }
 
-    public CartResponse setItems(Item[] items) {
+    public ItemListResponse setItems(Item[] items) {
         this.items = items;
         return this;
     }

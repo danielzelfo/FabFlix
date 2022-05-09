@@ -2,7 +2,7 @@ package com.github.klefstad_teaching.cs122b.billing.rest;
 
 import com.github.klefstad_teaching.cs122b.billing.model.request.MovieRequest;
 import com.github.klefstad_teaching.cs122b.billing.model.response.BasicResponse;
-import com.github.klefstad_teaching.cs122b.billing.model.response.CartResponse;
+import com.github.klefstad_teaching.cs122b.billing.model.response.ItemListResponse;
 import com.github.klefstad_teaching.cs122b.billing.repo.BillingRepo;
 import com.github.klefstad_teaching.cs122b.billing.repo.entity.Item;
 import com.github.klefstad_teaching.cs122b.billing.util.Validate;
@@ -97,7 +97,7 @@ public class CartController
     }
 
     @GetMapping("/cart/retrieve")
-    public ResponseEntity<CartResponse> retreiveCart(@AuthenticationPrincipal SignedJWT user) {
+    public ResponseEntity<ItemListResponse> retreiveCart(@AuthenticationPrincipal SignedJWT user) {
         Integer userId;
         List<String> roles;
         try {
@@ -130,7 +130,7 @@ public class CartController
         total = total.setScale(2);
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CartResponse()
+                .body(new ItemListResponse()
                         .setResult(BillingResults.CART_RETRIEVED)
                         .setItems(cartItems)
                         .setTotal(total));

@@ -274,11 +274,43 @@ public class BillingRepo
                         (rs, rowNum) ->
                                 new Order()
                                         .setSaleId(rs.getLong("id"))
-                                        .setTotal(rs.getBigDecimal("total"))
+                                        .setTotal(rs.getBigDecimal("total").setScale(2))
                                         .setOrderDate(rs.getTimestamp("order_date").toInstant())
                 );
 
         //return as array
         return orders.toArray(new Order[0]);
+    }
+
+    public Item[] getOrderItems(Integer userId, Long saleId) {
+        MapSqlParameterSource source =
+                new MapSqlParameterSource()
+                        .addValue("sale_id", saleId, Types.INTEGER)
+                        .addValue("user_id", userId, Types.INTEGER);
+
+        String sql = "SELECT JSON_ARRAYAGG(JSON_OBJECT( 'unitPrice', mp.unit_price, 'quantity', si.quantity, 'movieId', si.movie_id, 'movieTitle', m.title, 'backdropPath', m.backdrop_path, 'posterPath', m.poster_path, 'premiumDiscount', mp.premium_discount )) " +
+                "FROM billing.sale_item si " +
+                "JOIN billing.sale s ON s.id = si.sale_id " +
+                "JOIN billing.movie_price mp ON si.movie_id = mp.movie_id " +
+                "JOIN movies.movie m ON si.movie_id = m.id " +
+                "WHERE si.sale_id = :sale_id AND s.user_id = :user_id;";
+
+        String jsonArrayString = "";
+        try {
+            jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
+        } catch (EmptyResultDataAccessException exc ) {
+            //this shouldn't happen
+            return new Item[0];
+        }
+        if (jsonArrayString == null) {
+            return new Item[0];
+        }
+
+        try {
+            return this.objectMapper.readValue(jsonArrayString, Item[].class);
+        } catch( JsonProcessingException exc ) {
+            //this shouldn't happen
+            return new Item[0];
+        }
     }
 }
