@@ -14,12 +14,13 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -100,10 +101,6 @@ public class BillingRepo {
                 source,
                 (rs, rowNum) -> adjustedItem(rs, roles)
         ).toArray(new Item[0]);
-    }
-
-    private Item[] retrieveUserCart(Integer userId) {
-        return retrieveUserCart(userId, Collections.emptyList());
     }
 
     public Item[] retrieveUserCart(Integer userId, List<String> roles) {
@@ -189,33 +186,24 @@ public class BillingRepo {
         this.template.update(sql, source);
     }
 
-    private Integer getPreviousUserSaleId(Integer userId) {
-        // note: this must run after recordSale
-        String sql = "SELECT id FROM billing.sale " +
-                "WHERE user_id = :user_id " +
-                "ORDER BY id DESC LIMIT 1;";
+    private void recordItemsSale(Integer userId) {
+        String sql = "INSERT INTO billing.sale_item (sale_id, movie_id, quantity) " +
+                "SELECT MAX(s.id) AS sale_id, c.movie_id AS movie_id, c.quantity " +
+                "FROM billing.cart c " +
+                "JOIN billing.sale s ON s.user_id = c.user_id " +
+                "WHERE c.user_id = :user_id " +
+                "GROUP BY c.movie_id;";
 
-        MapSqlParameterSource source =
-                new MapSqlParameterSource()
-                        .addValue("user_id", userId, Types.INTEGER);
+        MapSqlParameterSource source = new MapSqlParameterSource()
+                .addValue("user_id", userId, Types.INTEGER);
 
-        return this.template.queryForObject(sql, source, (rs, rowNum) -> rs.getInt(1));
+        this.template.update(sql, source);
     }
 
-    private void recordItemsSale(Integer userId) {
-        Item[] cartItems = retrieveUserCart(userId);
-
-        Integer saleId = getPreviousUserSaleId(userId);
-
-        String sql = "INSERT INTO billing.sale_item (sale_id, movie_id, quantity) " +
-                "VALUES (:sale_id, :movie_id, :quantity);";
-
-        for (Item cartItem : cartItems) {
-            this.template.update(sql, new MapSqlParameterSource()
-                    .addValue("sale_id", saleId, Types.INTEGER)
-                    .addValue("movie_id", cartItem.getMovieId(), Types.INTEGER)
-                    .addValue("quantity", cartItem.getQuantity(), Types.INTEGER));
-        }
+    @Transactional
+    protected void recordSaleTransaction(Integer userId, BigDecimal total) {
+        recordSale(userId, total);
+        recordItemsSale(userId);
     }
 
     public void completeOrder(Integer userId, PaymentIntentRequest paymentIntentRequest) {
@@ -238,8 +226,7 @@ public class BillingRepo {
 
         BigDecimal total = BigDecimal.valueOf(retrievedPaymentIntent.getAmount()).divide(BigDecimal.valueOf(100)).setScale(2);
 
-        recordSale(userId, total);
-        recordItemsSale(userId);
+        recordSaleTransaction(userId, total);
         clearCart(userId);
     }
 
