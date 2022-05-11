@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -176,34 +178,30 @@ public class BillingRepo {
         }
     }
 
-    private void recordSale(Integer userId, BigDecimal total) {
+    private Integer recordSale(Integer userId, BigDecimal total) {
         String sql = "INSERT INTO billing.sale (user_id, total) " +
                 "VALUES (:user_id, :total);";
         MapSqlParameterSource source =
                 new MapSqlParameterSource()
                         .addValue("user_id", userId, Types.INTEGER)
                         .addValue("total", total, Types.DECIMAL);
-        this.template.update(sql, source);
+
+        KeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+        this.template.update(sql, source, generatedKeyHolder);
+        return generatedKeyHolder.getKey().intValue();
     }
 
-    private void recordItemsSale(Integer userId) {
+    private void recordItemsSale(Integer userId, Integer saleId) {
         String sql = "INSERT INTO billing.sale_item (sale_id, movie_id, quantity) " +
-                "SELECT MAX(s.id) AS sale_id, c.movie_id AS movie_id, c.quantity " +
+                "SELECT :sale_id AS sale_id, c.movie_id, c.quantity " +
                 "FROM billing.cart c " +
-                "JOIN billing.sale s ON s.user_id = c.user_id " +
-                "WHERE c.user_id = :user_id " +
-                "GROUP BY c.movie_id;";
+                "WHERE c.user_id = :user_id ";
 
         MapSqlParameterSource source = new MapSqlParameterSource()
-                .addValue("user_id", userId, Types.INTEGER);
+                .addValue("user_id", userId, Types.INTEGER)
+                .addValue("sale_id", saleId, Types.INTEGER);
 
         this.template.update(sql, source);
-    }
-
-    @Transactional
-    protected void recordSaleTransaction(Integer userId, BigDecimal total) {
-        recordSale(userId, total);
-        recordItemsSale(userId);
     }
 
     public void completeOrder(Integer userId, PaymentIntentRequest paymentIntentRequest) {
@@ -226,7 +224,7 @@ public class BillingRepo {
 
         BigDecimal total = BigDecimal.valueOf(retrievedPaymentIntent.getAmount()).divide(BigDecimal.valueOf(100)).setScale(2);
 
-        recordSaleTransaction(userId, total);
+        recordItemsSale(userId, recordSale(userId, total));
         clearCart(userId);
     }
 
