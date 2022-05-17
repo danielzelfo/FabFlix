@@ -5,7 +5,7 @@ import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
 import { View, Text, Button, TextInput } from "react-native";
 import {Picker} from '@react-native-picker/picker';
-import {AppStyles} from "style/Styles"
+import {AppStyles} from "style/Styles";
 
 
 const SearchMovie = () => {

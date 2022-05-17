@@ -1,30 +1,12 @@
 import React, { useState } from "react";
 import {Link} from "react-router-dom";
 import {useUser} from "hook/User";
-import styled from "styled-components";
 import {useForm} from "react-hook-form";
 import {login} from "backend/idm";
 import { useNavigate } from "react-router-dom";
-
-const MainDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: calc(100% - 20px);
-`
-
-const LoginForm = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 30%;
-    min-width: 300px;
-`
-
-const ErrorMsgP = styled.p`
-    color: red;
-    width: 100%;
-    text-align: center;
-`
+import { View, Text } from "react-native";
+import {AppStyles} from "style/Styles";
+import {CredentialForm} from "components/CredentialForm";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -35,7 +17,7 @@ const Login = () => {
 
     const [errorMessage, setErrorMessage] = useState(["", false]);
 
-    const {register, getValues, handleSubmit} = useForm();
+    const {control, handleSubmit} = useForm();
 
     const handleLoginSucess = (response) => {
         setAccessToken(response.data.accessToken)
@@ -53,14 +35,17 @@ const Login = () => {
         }
     }
 
-    const submitLogin = () => {
-        const email = getValues("email");
-        const password = getValues("password");
-
-        const payLoad = {
-            email: email,
-            password: password.split('')
+    const submitLogin = (payLoad) => {
+        if (payLoad.email === undefined) {
+            setErrorMessage(["Email is required", false]);
+            return;
         }
+        if (payLoad.password === undefined) {
+            setErrorMessage(["Password is required", false]);
+            return;
+        }
+        
+        payLoad.password = payLoad.password.split('');
 
         login(payLoad)
             .then(response => handleLoginSucess(response))
@@ -68,17 +53,13 @@ const Login = () => {
     }
 
     return (
-        <MainDiv>
-            <h1>Login</h1>
-            <LoginForm>
-                <input placeholder="email" type={"email"} {...register("email")} />
-                <input placeholder="password" type={"password"} {...register("password")} />
-                <button onClick={handleSubmit(submitLogin)}>Login</button>
-            </LoginForm>
+        <View style={AppStyles.MainDiv}>
+            <Text style={AppStyles.H1Text}>Login</Text>
+            <CredentialForm title="Register" onPress={handleSubmit(submitLogin)} control={control}/> 
             {errorMessage[0] && (
-                <ErrorMsgP> {errorMessage[0]}{errorMessage[1] && <Link to="/register">here</Link>}. </ErrorMsgP>
+                <Text style={AppStyles.ErrorMsg}> {errorMessage[0]}{errorMessage[1] && <Link to="/register">here</Link>}. </Text>
             )}
-        </MainDiv>
+        </View>
     );
 }
 

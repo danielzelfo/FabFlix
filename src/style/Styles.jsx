@@ -24,7 +24,10 @@ const CustomInputStyle = {
 
 export const AppStyles = StyleSheet.create({
     MainDiv: {
-        width: "calc(100% - 50px)"
+        width: "calc(100% - 50px)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
     },
     VerticalDiv: {
         display: "flex",
@@ -105,5 +108,16 @@ export const AppStyles = StyleSheet.create({
     CustomInputNum: {
         ...CustomInputStyle,
         width: "4em"
+    },
+    ErrorMsg: {
+        color: "red",
+        width: "100%",
+        textAlign: "center"
+    },
+    CredentialForm: {
+        display: "flex",
+        flexDirection: "column",
+        width: "30%",
+        minWidth: "300px"
     }
 });
