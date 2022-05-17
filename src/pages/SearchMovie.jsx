@@ -1,95 +1,118 @@
 import React, { useState }  from "react";
-import styled from "styled-components";
 import {useForm} from "react-hook-form";
 import {search_backend} from "backend/movies";
 import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
+import { StyleSheet, View, Text, Button, TextInput } from "react-native";
+import {Picker} from '@react-native-picker/picker';
 
-const MainDiv = styled.div`
-  width: calc(100% - 50px);
-`
+const HorizontalDivStyle = {
+    display: "flex",
+    flexDirection: "row",
+    gap: "5px",
+    width: "100%"
+}
 
-const VerticalDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`
+const ResultCellStyle = {
+    border: "1px solid #eee",
+    display: "table-cell",
+    padding: "3px 10px"
+}
 
-const HorizontalDiv = styled.div`
-    display:flex; 
-    flex-direction: row;
-    gap: 5px;
-    width: 100%;
-`
+const CustomInputStyle = {
+    backgroundColor: "white",
+    border: "1px solid black",
+    borderRadius: "7.5px",
+    padding: "2.5px",
+    paddingLeft: "10px",
+    paddingRight: "10px"
+}
 
-const ResultTable = styled.div`
-    margin-top: 50px;
-	display: table;
-    box-shadow: 0 2px 10px rgb(0 0 0 / 20%);
-    width: 100%;
-`
-
-const ResultRow = styled.div`
-	display: table-row;
-    div:nth-child(1) {
-        width: 60%;
+const styles = StyleSheet.create({
+    MainDiv: {
+        width: "calc(100% - 50px)"
+    },
+    VerticalDiv: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        alignItems: "center"
+    },
+    HorizontalDivCenter: {
+        ...HorizontalDivStyle,
+        justifyContent: "center"
+    },
+    HorizontalDivCenterDown: {
+        ...HorizontalDivStyle,
+        marginTop: "50px", 
+        justifyContent: "center"
+    },
+    HorizontalDivRight: {
+        ...HorizontalDivStyle,
+        justifyContent: "right"
+    },
+    ResultTable: {
+        marginTop: "50px",
+        display: "table",
+        boxShadow: "0 2px 10px rgb(0 0 0 / 20%)",
+        width: "100%"
+    },
+    ResultRow: {
+        display: "table-row"
+    },
+    ResultCell1: {
+        ...ResultCellStyle,
+        width: "60%"
+    },
+    ResultCell23: {
+        ...ResultCellStyle,
+        width: "20%"
+    },
+    ResultCellText: {
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis"
+    },
+    ResultCellTextCentered: {
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        display: "flex",
+        justifyContent: "center"
+    },
+    H1Text: {
+        display: "block",
+        fontSize: "2em",
+        marginTop: "0.67em",
+        marginBottom: "0.67em",
+        marginLeft: "0",
+        marginRight: "0",
+        fontWeight: "bold"
+    },
+    BoldCenteredText: {
+        fontWeight: "bold",
+        display: "flex",
+        justifyContent: "center"
+    },
+    SelectStyle: {
+        backgroundColor: "white",
+        border: "1px solid black",
+        borderRadius: "7.5px",
+        padding: "2.5px",
+        paddingLeft: "10px",
+        paddingRight: "10px"
+    },
+    ResultBody: {
+        display: "table-row-group"
+    },
+    CustomInput: {
+        ...CustomInputStyle
+    },
+    CustomInputNum: {
+        ...CustomInputStyle,
+        width: "4em"
     }
-    div:nth-child(2), div:nth-child(3) {
-        width: 20%;
-    }
-`
-
-const ResultCell = styled.div`
-	border: 1px solid #eee;
-	display: table-cell;
-	padding: 3px 10px;
-    p {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-`
-
-const ResultBody = styled.div`
-	display: table-row-group;
-`
-
-const CustomButton = styled.button`
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 7.5px;
-    padding: 2.5px;
-    padding-left: 10px;
-    padding-right: 10px;
-    &:hover {
-        background-color: black;
-        color: white;
-    }
-`
-
-const CustomSelect = styled.select`
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 7.5px;
-    padding: 2.5px;
-    padding-left: 10px;
-    padding-right: 10px;
-`
-
-const CustomInput = styled.input`
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 7.5px;
-    padding: 2.5px;
-    padding-left: 10px;
-    padding-right: 10px;
-    outline: none;
-`
-
-const TableHeaderCellP = styled.p`
-    font-weight: bold;
-    text-align: center;
-`
+});
 
 
 const SearchMovie = () => {
@@ -179,79 +202,79 @@ const SearchMovie = () => {
     }
 
     return (
-        <MainDiv>
-            <VerticalDiv style={{alignItems: "center"}}>
-                <h1>Search Movie</h1>
-                <HorizontalDiv style={{justifyContent: "right"}}>
-                    <CustomSelect id="limit" {...register("limit")}>
-                        <option value="10">Limit: 10</option>
-                        <option value="25">Limit: 25</option>
-                        <option value="50">Limit: 50</option>
-                        <option value="100">Limit: 100</option>
-                    </CustomSelect>
-                    <CustomSelect id="orderBy" {...register("orderBy")}>
-                        <option value="title">Sort by: title</option>
-                        <option value="rating">Sort by: rating</option>
-                        <option value="year">Sort by: year</option>
-                    </CustomSelect>
-                    <CustomSelect id="direction" {...register("direction")}>
-                        <option value="ASC">Direction: ASC</option>
-                        <option value="DESC">Direction: DESC</option>
-                    </CustomSelect>
-                </HorizontalDiv>
-                <HorizontalDiv style={{justifyContent: "center"}}>
-                    <CustomInput placeholder="title" {...register("title")} />
-                    <CustomInput placeholder="year" {...register("year")} />
-                    <CustomInput placeholder="director" {...register("director")} />
-                    <CustomInput placeholder="genre" {...register("genre")} />
-                    <CustomButton onClick={handleSubmit(submitSearch)}>Search</CustomButton>
-                </HorizontalDiv>
-                <HorizontalDiv style={{justifyContent: "right"}}>
-                    <label htmlFor="page">Page</label>
-                    <CustomInput id="page" type="number" min="1" placeholder="1" style={{width: "4em"}} {...register("page")}/>
-                </HorizontalDiv>
-            </VerticalDiv>
+        <View style={styles.MainDiv}>
+            <View style={styles.VerticalDiv}>
+                <Text style={styles.H1Text}>Search Movie</Text>
+                <View style={styles.HorizontalDivRight}>
+                    <Picker style={styles.SelectStyle} {...register("limit")}>
+                        <Picker.Item label="Limit: 10" value="10" />
+                        <Picker.Item label="Limit: 25" value="25" />
+                        <Picker.Item label="Limit: 50" value="50" />
+                        <Picker.Item label="Limit: 100" value="100" />
+                    </Picker>
+                    <Picker style={styles.SelectStyle} {...register("orderBy")}>
+                        <Picker.Item label="Sort by: title" value="title" />
+                        <Picker.Item label="Sort by: rating" value="rating" />
+                        <Picker.Item label="Sort by: year" value="year" />
+                    </Picker>
+                    <Picker style={styles.SelectStyle} {...register("direction")}>
+                        <Picker.Item label="Direction: ASC " value="ASC" />
+                        <Picker.Item label="Direction: DESC" value="DESC" />
+                    </Picker>
+                </View>
+                <View style={styles.HorizontalDivCenter}>
+                    <TextInput style={styles.CustomInput} placeholder="title" {...register("title")} />
+                    <TextInput style={styles.CustomInput} placeholder="year" {...register("year")} />
+                    <TextInput style={styles.CustomInput} placeholder="director" {...register("director")} />
+                    <TextInput style={styles.CustomInput} placeholder="genre" {...register("genre")} />
+                    <Button title="Search" onPress={handleSubmit(submitSearch)} />
+                </View>
+                <View style={styles.HorizontalDivRight}>
+                    <Text>Page</Text>
+                    <TextInput style={styles.CustomInputNum} placeholder="1" {...register("page")}/>
+                </View>
+            </View>
             
             {
             results.length > 0 ?
-                <div>
-                    <ResultTable>
-                        <ResultBody>
-                            <ResultRow>
-                                <ResultCell><TableHeaderCellP>Title</TableHeaderCellP></ResultCell>
-                                <ResultCell><TableHeaderCellP>Year</TableHeaderCellP></ResultCell>
-                                <ResultCell><TableHeaderCellP>Director</TableHeaderCellP></ResultCell>
-                            </ResultRow>
+                <View>
+                    <View style={styles.ResultTable}>
+                        <View style={styles.ResultBody}>
+                            <View style={styles.ResultRow}>
+                                <View style={styles.ResultCell1}><Text style={styles.BoldCenteredText}>Title</Text></View>
+                                <View style={styles.ResultCell23}><Text style={styles.BoldCenteredText}>Year</Text></View>
+                                <View style={styles.ResultCell23}><Text style={styles.BoldCenteredText}>Director</Text></View>
+                            </View>
                         {
                         results.map( result =>
-                            <ResultRow key={result.id}>
-                                <ResultCell><p>{result.title}</p></ResultCell>
-                                <ResultCell><p>{result.year}</p></ResultCell>
-                                <ResultCell><p>{result.director}</p></ResultCell>
-                            </ResultRow>
+                            <View style={styles.ResultRow} key={result.id}>
+                                <View style={styles.ResultCell1}><Text style={styles.ResultCellText}>{result.title}</Text></View>
+                                <View style={styles.ResultCell23}><Text style={styles.ResultCellText}>{result.year}</Text></View>
+                                <View style={styles.ResultCell23}><Text style={styles.ResultCellText}>{result.director}</Text></View>
+                            </View>
                         )
                         }
-                        </ResultBody>
-                    </ResultTable>
-                    <HorizontalDiv style={{marginTop: "50px", justifyContent: "center"}}>
-                        <CustomButton onClick={prevPage}>prev</CustomButton>
-                        <CustomButton onClick={nextPage}>next</CustomButton>
-                    </HorizontalDiv>
-                </div>
+                        </View>
+                    </View>
+                    <View style={styles.HorizontalDivCenterDown}>
+                        <Button title="prev" onPress={prevPage} />
+                        <Button title="next" onPress={nextPage} />
+                    </View>
+                </View>
             :
-                <ResultTable>
-                    <ResultBody>
-                        <ResultRow>
-                            <ResultCell >
-                                <p style={{textAlign: "center"}}>No results</p>
-                            </ResultCell>
-                        </ResultRow>
-                    </ResultBody>
-                </ResultTable>
+                <View style={styles.HorizontalDivCenter}>
+                    <View style={styles.ResultTable}>
+                        <View style={styles.ResultBody}>
+                            <View style={styles.ResultRow} >
+                                <View style={styles.ResultCell1} >
+                                    <Text style={styles.ResultCellTextCentered}>No results</Text>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </View>
             }
-            
-        </MainDiv>
-        
+        </View>
     );
 }
 
