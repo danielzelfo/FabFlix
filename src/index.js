@@ -3,8 +3,6 @@ import ReactDOM from 'react-dom';
 import {BrowserRouter} from "react-router-dom";
 import App from 'app/App';
 
-import "index.css";
-
 /**
  * This is the starting point of our application!
  *
