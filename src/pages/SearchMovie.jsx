@@ -3,116 +3,9 @@ import {useForm} from "react-hook-form";
 import {search_backend} from "backend/movies";
 import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
-import { StyleSheet, View, Text, Button, TextInput } from "react-native";
+import { View, Text, Button, TextInput } from "react-native";
 import {Picker} from '@react-native-picker/picker';
-
-const HorizontalDivStyle = {
-    display: "flex",
-    flexDirection: "row",
-    gap: "5px",
-    width: "100%"
-}
-
-const ResultCellStyle = {
-    border: "1px solid #eee",
-    display: "table-cell",
-    padding: "3px 10px"
-}
-
-const CustomInputStyle = {
-    backgroundColor: "white",
-    border: "1px solid black",
-    borderRadius: "7.5px",
-    padding: "2.5px",
-    paddingLeft: "10px",
-    paddingRight: "10px"
-}
-
-const styles = StyleSheet.create({
-    MainDiv: {
-        width: "calc(100% - 50px)"
-    },
-    VerticalDiv: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        alignItems: "center"
-    },
-    HorizontalDivCenter: {
-        ...HorizontalDivStyle,
-        justifyContent: "center"
-    },
-    HorizontalDivCenterDown: {
-        ...HorizontalDivStyle,
-        marginTop: "50px", 
-        justifyContent: "center"
-    },
-    HorizontalDivRight: {
-        ...HorizontalDivStyle,
-        justifyContent: "right"
-    },
-    ResultTable: {
-        marginTop: "50px",
-        display: "table",
-        boxShadow: "0 2px 10px rgb(0 0 0 / 20%)",
-        width: "100%"
-    },
-    ResultRow: {
-        display: "table-row"
-    },
-    ResultCell1: {
-        ...ResultCellStyle,
-        width: "60%"
-    },
-    ResultCell23: {
-        ...ResultCellStyle,
-        width: "20%"
-    },
-    ResultCellText: {
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis"
-    },
-    ResultCellTextCentered: {
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        display: "flex",
-        justifyContent: "center"
-    },
-    H1Text: {
-        display: "block",
-        fontSize: "2em",
-        marginTop: "0.67em",
-        marginBottom: "0.67em",
-        marginLeft: "0",
-        marginRight: "0",
-        fontWeight: "bold"
-    },
-    BoldCenteredText: {
-        fontWeight: "bold",
-        display: "flex",
-        justifyContent: "center"
-    },
-    SelectStyle: {
-        backgroundColor: "white",
-        border: "1px solid black",
-        borderRadius: "7.5px",
-        padding: "2.5px",
-        paddingLeft: "10px",
-        paddingRight: "10px"
-    },
-    ResultBody: {
-        display: "table-row-group"
-    },
-    CustomInput: {
-        ...CustomInputStyle
-    },
-    CustomInputNum: {
-        ...CustomInputStyle,
-        width: "4em"
-    }
-});
+import {AppStyles} from "style/Styles"
 
 
 const SearchMovie = () => {
@@ -202,72 +95,72 @@ const SearchMovie = () => {
     }
 
     return (
-        <View style={styles.MainDiv}>
-            <View style={styles.VerticalDiv}>
-                <Text style={styles.H1Text}>Search Movie</Text>
-                <View style={styles.HorizontalDivRight}>
-                    <Picker style={styles.SelectStyle} {...register("limit")}>
+        <View style={AppStyles.MainDiv}>
+            <View style={AppStyles.VerticalDiv}>
+                <Text style={AppStyles.H1Text}>Search Movie</Text>
+                <View style={AppStyles.HorizontalDivRight}>
+                    <Picker style={AppStyles.SelectStyle} {...register("limit")}>
                         <Picker.Item label="Limit: 10" value="10" />
                         <Picker.Item label="Limit: 25" value="25" />
                         <Picker.Item label="Limit: 50" value="50" />
                         <Picker.Item label="Limit: 100" value="100" />
                     </Picker>
-                    <Picker style={styles.SelectStyle} {...register("orderBy")}>
+                    <Picker style={AppStyles.SelectStyle} {...register("orderBy")}>
                         <Picker.Item label="Sort by: title" value="title" />
                         <Picker.Item label="Sort by: rating" value="rating" />
                         <Picker.Item label="Sort by: year" value="year" />
                     </Picker>
-                    <Picker style={styles.SelectStyle} {...register("direction")}>
+                    <Picker style={AppStyles.SelectStyle} {...register("direction")}>
                         <Picker.Item label="Direction: ASC " value="ASC" />
                         <Picker.Item label="Direction: DESC" value="DESC" />
                     </Picker>
                 </View>
-                <View style={styles.HorizontalDivCenter}>
-                    <TextInput style={styles.CustomInput} placeholder="title" {...register("title")} />
-                    <TextInput style={styles.CustomInput} placeholder="year" {...register("year")} />
-                    <TextInput style={styles.CustomInput} placeholder="director" {...register("director")} />
-                    <TextInput style={styles.CustomInput} placeholder="genre" {...register("genre")} />
+                <View style={AppStyles.HorizontalDivCenter}>
+                    <TextInput style={AppStyles.CustomInput} placeholder="title" {...register("title")} />
+                    <TextInput style={AppStyles.CustomInput} placeholder="year" {...register("year")} />
+                    <TextInput style={AppStyles.CustomInput} placeholder="director" {...register("director")} />
+                    <TextInput style={AppStyles.CustomInput} placeholder="genre" {...register("genre")} />
                     <Button title="Search" onPress={handleSubmit(submitSearch)} />
                 </View>
-                <View style={styles.HorizontalDivRight}>
+                <View style={AppStyles.HorizontalDivRight}>
                     <Text>Page</Text>
-                    <TextInput style={styles.CustomInputNum} placeholder="1" {...register("page")}/>
+                    <TextInput style={AppStyles.CustomInputNum} placeholder="1" {...register("page")}/>
                 </View>
             </View>
             
             {
             results.length > 0 ?
                 <View>
-                    <View style={styles.ResultTable}>
-                        <View style={styles.ResultBody}>
-                            <View style={styles.ResultRow}>
-                                <View style={styles.ResultCell1}><Text style={styles.BoldCenteredText}>Title</Text></View>
-                                <View style={styles.ResultCell23}><Text style={styles.BoldCenteredText}>Year</Text></View>
-                                <View style={styles.ResultCell23}><Text style={styles.BoldCenteredText}>Director</Text></View>
+                    <View style={AppStyles.ResultTable}>
+                        <View style={AppStyles.ResultBody}>
+                            <View style={AppStyles.ResultRow}>
+                                <View style={AppStyles.ResultCell1}><Text style={AppStyles.BoldCenteredText}>Title</Text></View>
+                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Year</Text></View>
+                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Director</Text></View>
                             </View>
                         {
                         results.map( result =>
-                            <View style={styles.ResultRow} key={result.id}>
-                                <View style={styles.ResultCell1}><Text style={styles.ResultCellText}>{result.title}</Text></View>
-                                <View style={styles.ResultCell23}><Text style={styles.ResultCellText}>{result.year}</Text></View>
-                                <View style={styles.ResultCell23}><Text style={styles.ResultCellText}>{result.director}</Text></View>
+                            <View style={AppStyles.ResultRow} key={result.id}>
+                                <View style={AppStyles.ResultCell1}><Text style={AppStyles.ResultCellText}>{result.title}</Text></View>
+                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.year}</Text></View>
+                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.director}</Text></View>
                             </View>
                         )
                         }
                         </View>
                     </View>
-                    <View style={styles.HorizontalDivCenterDown}>
+                    <View style={AppStyles.HorizontalDivCenterDown}>
                         <Button title="prev" onPress={prevPage} />
                         <Button title="next" onPress={nextPage} />
                     </View>
                 </View>
             :
-                <View style={styles.HorizontalDivCenter}>
-                    <View style={styles.ResultTable}>
-                        <View style={styles.ResultBody}>
-                            <View style={styles.ResultRow} >
-                                <View style={styles.ResultCell1} >
-                                    <Text style={styles.ResultCellTextCentered}>No results</Text>
+                <View style={AppStyles.HorizontalDivCenter}>
+                    <View style={AppStyles.ResultTable}>
+                        <View style={AppStyles.ResultBody}>
+                            <View style={AppStyles.ResultRow} >
+                                <View style={AppStyles.ResultCell1} >
+                                    <Text style={AppStyles.ResultCellTextCentered}>No results</Text>
                                 </View>
                             </View>
                         </View>
