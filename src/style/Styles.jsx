@@ -119,5 +119,44 @@ export const AppStyles = StyleSheet.create({
         flexDirection: "column",
         width: "30%",
         minWidth: "300px"
+    },
+    MapDiv: {
+        width: "60%",
+        minWidth: "300px",
+        marginTop: "20px"
+    },
+    StyledDiv: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        width: "100%"
+    },
+    ContentDiv: {
+        display: "flex",
+        boxSizing: "border-box",
+        width: "100%",
+        minHeight: "calc(100vh - 50px)",
+        padding: "25px",
+        backgroundColor: "#ffffff",
+        boxShadow: "inset 0 3px 5px -3px #000000"
+    },
+    StyledNav: {
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        width: "calc(100% - 80px)",
+        height: "50px",
+        position: "relative",
+        left: "5px",
+        backgroundColor: "#fff"
+    },
+    MainNav: {
+        position: "relative",
+        left: "50%",
+        transform: "translate(-50%)",
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "center",
+        width: "calc(100% - 10px)"
     }
 });

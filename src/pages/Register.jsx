@@ -35,7 +35,7 @@ const Register = () => {
         <View style={AppStyles.MainDiv}>
             <Text style={AppStyles.H1Text}>Register</Text>
             <CredentialForm title="Register" onPress={handleSubmit(submitRegister)} control={control}/> 
-            {errorMessage[0] && (
+            {!!errorMessage[0] && (
                 <Text style={AppStyles.ErrorMsg}> {errorMessage[0]}{errorMessage[1]&&<Link to="/login">here</Link>}. </Text>
             )}
         </View>

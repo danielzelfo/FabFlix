@@ -47,8 +47,8 @@ const SearchMovie = () => {
     }
 
     const handleException = (error) => {
-        setAccessToken(null);
         navigate("/login");
+        setAccessToken(null);
     }
 
     const submitSearch = () => {

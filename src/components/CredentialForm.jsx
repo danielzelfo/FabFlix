@@ -13,7 +13,7 @@ export class CredentialForm extends Component {
             render={
                 ({ field: { value, onChange } }) => (
                 <TextInput
-                    value={value}
+                    value={value || ""}
                     onChangeText={onChange}
                     placeholder="email"
                 />
@@ -24,7 +24,7 @@ export class CredentialForm extends Component {
             control={this.props.control}
             render={({ field: { value, onChange } }) => (
                 <TextInput
-                    value={value}
+                    value={value || ""}
                     onChangeText={onChange}
                     secureTextEntry={true}
                     placeholder="Password"

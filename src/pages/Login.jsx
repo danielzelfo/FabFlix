@@ -20,9 +20,9 @@ const Login = () => {
     const {control, handleSubmit} = useForm();
 
     const handleLoginSucess = (response) => {
-        setAccessToken(response.data.accessToken)
-        setRefreshToken(response.data.refreshToken)
-        navigate("/")
+        navigate("/");
+        setAccessToken(response.data.accessToken);
+        setRefreshToken(response.data.refreshToken);
     }
 
     const handleLoginFail = (error) => {
@@ -55,9 +55,9 @@ const Login = () => {
     return (
         <View style={AppStyles.MainDiv}>
             <Text style={AppStyles.H1Text}>Login</Text>
-            <CredentialForm title="Register" onPress={handleSubmit(submitLogin)} control={control}/> 
-            {errorMessage[0] && (
-                <Text style={AppStyles.ErrorMsg}> {errorMessage[0]}{errorMessage[1] && <Link to="/register">here</Link>}. </Text>
+            <CredentialForm title="Login" onPress={handleSubmit(submitLogin)} control={control}/> 
+            {!!errorMessage[0] && (
+                <Text style={AppStyles.ErrorMsg}>{errorMessage[0]}{errorMessage[1] && <Link to="/register">here</Link>}. </Text>
             )}
         </View>
     );

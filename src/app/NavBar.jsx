@@ -3,16 +3,8 @@ import {NavLink} from "react-router-dom";
 import styled from "styled-components";
 import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
-
-const StyledNav = styled.nav`
-  display: flex;
-  justify-content: center;
-  width: calc(100% - 40px);
-  height: 50px;
-  position: relative;
-  left: 5px;
-  background-color: #fff;
-`;
+import { AppStyles } from "style/Styles";
+import { View, Button } from "react-native";
 
 const StyledNavLink = styled(NavLink)`
   padding: 10px;
@@ -20,28 +12,6 @@ const StyledNavLink = styled(NavLink)`
   color: #000;
   text-decoration: none;
 `;
-
-
-const MainNav = styled.div`
-    position: relative;
-    left: 50%;
-    transform: translate(-50%);
-    display: flex;
-    justify-content: center;
-    width: calc(100% - 10px);
-`
-
-const LogoutButton = styled.button`
-    margin-left: 5px;
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 7.5px;
-    max-width: 40px;
-    &:hover {
-        background-color: black;
-        color: white;
-    }
-`
 
 const NavBar = () => {
     const navigate = useNavigate();
@@ -51,13 +21,13 @@ const NavBar = () => {
     } = useUser();
 
     const logoutUser = () => {
-        setAccessToken(null);
         navigate("/login");
+        setAccessToken(null);
     }
 
     return (
-        <MainNav>
-            <StyledNav>
+        <View style={AppStyles.MainNav}>
+            <View style={AppStyles.StyledNav}>
                 {!!accessToken && 
                     <StyledNavLink to="/">
                         Home
@@ -72,12 +42,14 @@ const NavBar = () => {
                     <StyledNavLink to="/register">
                         Register
                     </StyledNavLink>
-                }
-            </StyledNav>
+                } 
+            </View>
             {!!accessToken && 
-                <LogoutButton onClick={logoutUser}>log out</LogoutButton>
+                <View style={{width: "80px"}}>
+                    <Button  title="log out" onPress={logoutUser} />
+                </View>
             }
-        </MainNav>
+        </View>
     );
 }
 
