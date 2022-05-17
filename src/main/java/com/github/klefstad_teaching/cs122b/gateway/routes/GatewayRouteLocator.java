@@ -9,29 +9,35 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GatewayRouteLocator
-{
+public class GatewayRouteLocator {
     private final GatewayServiceConfig config;
-    private final AuthFilter           authFilter;
+    private final AuthFilter authFilter;
 
     @Autowired
     public GatewayRouteLocator(GatewayServiceConfig config,
-                               AuthFilter authFilter)
-    {
+                               AuthFilter authFilter) {
         this.config = config;
         this.authFilter = authFilter;
     }
 
     @Bean
-    public RouteLocator routeLocator(RouteLocatorBuilder builder)
-    {
+    public RouteLocator routeLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                      .route("idm",
-                             r -> r.uri(config.getIdm()))
-                      .route("movies",
-                             r -> r.uri(config.getMovies()))
-                      .route("billing",
-                             r -> r.uri(config.getBilling()))
-                      .build();
+                .route("idm",
+                        r -> r.path("/idm/**")
+                                .filters(f -> f.stripPrefix(1))
+                                .uri(config.getIdm()))
+
+                .route("movies",
+                        r -> r.path("/movies/**")
+                                .filters(f -> f.stripPrefix(1)
+                                        .filter(authFilter))
+                                .uri(config.getMovies()))
+                .route("billing",
+                        r -> r.path("/billing/**")
+                                .filters(f -> f.stripPrefix(1)
+                                        .filter(authFilter))
+                                .uri(config.getBilling()))
+                .build();
     }
 }

@@ -2,6 +2,7 @@ package com.github.klefstad_teaching.cs122b.gateway.filter;
 
 import com.github.klefstad_teaching.cs122b.gateway.config.GatewayServiceConfig;
 import com.github.klefstad_teaching.cs122b.gateway.repo.GatewayRepo;
+import com.github.klefstad_teaching.cs122b.gateway.repo.entity.GatewayRequestObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,12 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+import java.net.InetSocketAddress;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
+
 @Component
 public class GlobalLoggingFilter implements GlobalFilter, Ordered
 {
@@ -22,6 +29,7 @@ public class GlobalLoggingFilter implements GlobalFilter, Ordered
 
     private final GatewayRepo          gatewayRepo;
     private final GatewayServiceConfig config;
+    private LinkedBlockingQueue<GatewayRequestObject> requests = new LinkedBlockingQueue<>();
 
     @Autowired
     public GlobalLoggingFilter(GatewayRepo gatewayRepo, GatewayServiceConfig config)
@@ -33,6 +41,23 @@ public class GlobalLoggingFilter implements GlobalFilter, Ordered
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain)
     {
+        InetSocketAddress remoteAddr = exchange.getRequest().getRemoteAddress();
+        String addr = remoteAddr.toString();
+        int portStrLen = String.valueOf(remoteAddr.getPort()).length();
+        //localhost/address:[port] -> address
+        addr = addr.substring(10, addr.length() - (portStrLen + 1));
+
+        GatewayRequestObject reqObj = new GatewayRequestObject()
+                .setCall_time(Instant.now())
+                .setIp_address(addr)
+                .setPath(exchange.getRequest().getPath());
+
+        requests.add(reqObj);
+
+        if (requests.size() >= config.getMaxLogs()) {
+            drainRequests();
+        }
+
         return chain.filter(exchange);
     }
 
@@ -44,5 +69,14 @@ public class GlobalLoggingFilter implements GlobalFilter, Ordered
 
     public void drainRequests()
     {
+        List<GatewayRequestObject> drainedRequests = new ArrayList<>();
+
+        // This empties our "requests" queue and loads
+        // the values inside of "drainedRequests"
+        this.requests.drainTo(drainedRequests);
+
+        this.gatewayRepo.insertRequests(drainedRequests)
+                .subscribeOn(DB_SCHEDULER)
+                .subscribe();
     }
 }
