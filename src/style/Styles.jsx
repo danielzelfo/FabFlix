@@ -22,18 +22,26 @@ const CustomInputStyle = {
     paddingRight: "10px"
 }
 
+const VerticalDivStyle = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    alignItems: "center"
+}
+
 export const AppStyles = StyleSheet.create({
     MainDiv: {
-        width: "calc(100% - 50px)",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
     },
     VerticalDiv: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "10px",
-        alignItems: "center"
+        ...VerticalDivStyle
+    },
+    ResultContainerDiv: {
+        ...VerticalDivStyle,
+        width: "calc(100% - 100px)"
     },
     HorizontalDivCenter: {
         ...HorizontalDivStyle,
@@ -144,10 +152,10 @@ export const AppStyles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
-        width: "calc(100% - 80px)",
+        width: "100%",
         height: "50px",
-        position: "relative",
-        left: "5px",
+        // position: "relative",
+        // left: "5px",
         backgroundColor: "#fff"
     },
     MainNav: {
@@ -157,6 +165,14 @@ export const AppStyles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
+        alignItems: "center",
         width: "calc(100% - 10px)"
+    },
+    Input: {
+        padding: "15px"
+    },
+    LogoutButton: {
+        width: "80px",
+        marginLeft: "-80px"
     }
 });

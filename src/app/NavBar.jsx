@@ -45,7 +45,7 @@ const NavBar = () => {
                 } 
             </View>
             {!!accessToken && 
-                <View style={{width: "80px"}}>
+                <View style={AppStyles.LogoutButton}>
                     <Button  title="log out" onPress={logoutUser} />
                 </View>
             }

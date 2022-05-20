@@ -15,7 +15,8 @@ export class CredentialForm extends Component {
                 <TextInput
                     value={value || ""}
                     onChangeText={onChange}
-                    placeholder="email"
+                    placeholder="Email"
+                    style={AppStyles.Input}
                 />
             )}
         />
@@ -28,6 +29,7 @@ export class CredentialForm extends Component {
                     onChangeText={onChange}
                     secureTextEntry={true}
                     placeholder="Password"
+                    style={AppStyles.Input}
                 />
             )}
         />

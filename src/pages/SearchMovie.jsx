@@ -130,7 +130,7 @@ const SearchMovie = () => {
             
             {
             results.length > 0 ?
-                <View>
+                <View style={AppStyles.ResultContainerDiv}>
                     <View style={AppStyles.ResultTable}>
                         <View style={AppStyles.ResultBody}>
                             <View style={AppStyles.ResultRow}>
@@ -155,7 +155,7 @@ const SearchMovie = () => {
                     </View>
                 </View>
             :
-                <View style={AppStyles.HorizontalDivCenter}>
+                <View style={AppStyles.ResultContainerDiv}>
                     <View style={AppStyles.ResultTable}>
                         <View style={AppStyles.ResultBody}>
                             <View style={AppStyles.ResultRow} >
