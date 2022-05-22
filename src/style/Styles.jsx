@@ -174,5 +174,10 @@ export const AppStyles = StyleSheet.create({
     LogoutButton: {
         width: "80px",
         marginLeft: "-80px"
+    },
+    Backdrop: {
+        width: "100%",
+        height: "350px",
+        resizeMode: "contain"
     }
 });

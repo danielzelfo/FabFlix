@@ -7,6 +7,7 @@
   },
   "movies": {
     "baseUrl": "http://localhost:8082",
-    "search": "/movie/search"
+    "search": "/movie/search",
+    "movie": "/movie/"
   }
 }

@@ -1,11 +1,12 @@
 import React, { useState }  from "react";
 import {useForm} from "react-hook-form";
-import {search_backend} from "backend/movies";
+import {search_movies} from "backend/movies";
 import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
 import { View, Text, Button, TextInput } from "react-native";
 import {Picker} from '@react-native-picker/picker';
 import {AppStyles} from "style/Styles";
+import {Link} from "react-router-dom";
 
 
 const SearchMovie = () => {
@@ -60,7 +61,7 @@ const SearchMovie = () => {
                 payLoad[field_names[i]] = value;
         }
 
-        search_backend(payLoad, accessToken)
+        search_movies(payLoad, accessToken)
             .then(response => handleResultSuccess(payLoad, response))
             .catch(error => handleException(error))
     }
@@ -74,7 +75,7 @@ const SearchMovie = () => {
         else if (payLoad.page !== undefined) 
             delete payLoad.page;
         
-        search_backend(payLoad, accessToken)
+        search_movies(payLoad, accessToken)
             .then(response => handlePageResultSuccess(payLoad, response))
             .catch(error => handleException(error))
     }
@@ -141,7 +142,7 @@ const SearchMovie = () => {
                         {
                         results.map( result =>
                             <View style={AppStyles.ResultRow} key={result.id}>
-                                <View style={AppStyles.ResultCell1}><Text style={AppStyles.ResultCellText}>{result.title}</Text></View>
+                                <View style={AppStyles.ResultCell1}><Link to={`/movie/${result.id}`}><Text style={AppStyles.ResultCellText}>{result.title}</Text></Link></View>
                                 <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.year}</Text></View>
                                 <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.director}</Text></View>
                             </View>

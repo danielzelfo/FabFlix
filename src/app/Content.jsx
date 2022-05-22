@@ -1,6 +1,7 @@
 import React from "react";
 import {Route, Routes} from "react-router-dom";
 import {useUser} from "hook/User";
+import Movie from "pages/Movie";
 import SearchMovie from "pages/SearchMovie";
 import Register from "pages/Register";
 import Login from "pages/Login";
@@ -16,12 +17,21 @@ const Content = () => {
 
     return (
         <View style={AppStyles.ContentDiv}>
-            <Routes>
-                {!accessToken && <Route path="/register" element={<Register/>}/>}
-                {!accessToken && <Route path="/login" element={<Login/>}/>}
-                {!!accessToken && <Route path="/movies/search" element={<SearchMovie/>}/>}
-                {!accessToken ? <Route path="/" element={<Login/>}/> : <Route path="/" element={<Home/>}/>}
-            </Routes>
+            {!accessToken ? 
+                //logged in
+                <Routes>
+                    <Route path="/register" element={<Register/>}/>
+                    <Route path="/login" element={<Login/>}/>
+                    <Route path="/" element={<Login/>}/>
+                </Routes>
+            :
+                //not logged in
+                <Routes>
+                    <Route path="/" element={<Home/>}/>
+                    <Route path="/movies/search" element={<SearchMovie/>}/>
+                    <Route path="/movie/:movie_id" element={<Movie/>}/>
+                </Routes>
+            }
         </View>
     );
 }
