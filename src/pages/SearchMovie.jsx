@@ -1,5 +1,5 @@
 import React, { useState }  from "react";
-import {useForm} from "react-hook-form";
+import {useForm, Controller} from "react-hook-form";
 import {search_movies} from "backend/movies";
 import {useUser} from "hook/User";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,7 @@ const SearchMovie = () => {
         accessToken, setAccessToken
     } = useUser();
 
-    const {register, getValues, setValue, handleSubmit} = useForm();
+    const {control, getValues, setValue, handleSubmit} = useForm();
 
     // current page response data
     const [results, resultsSetter] = useState([]);
@@ -100,32 +100,50 @@ const SearchMovie = () => {
             <View style={AppStyles.VerticalDiv}>
                 <Text style={AppStyles.H1Text}>Search Movie</Text>
                 <View style={AppStyles.HorizontalDivRight}>
-                    <Picker style={AppStyles.SelectStyle} {...register("limit")}>
-                        <Picker.Item label="Limit: 10" value="10" />
-                        <Picker.Item label="Limit: 25" value="25" />
-                        <Picker.Item label="Limit: 50" value="50" />
-                        <Picker.Item label="Limit: 100" value="100" />
-                    </Picker>
-                    <Picker style={AppStyles.SelectStyle} {...register("orderBy")}>
-                        <Picker.Item label="Sort by: title" value="title" />
-                        <Picker.Item label="Sort by: rating" value="rating" />
-                        <Picker.Item label="Sort by: year" value="year" />
-                    </Picker>
-                    <Picker style={AppStyles.SelectStyle} {...register("direction")}>
-                        <Picker.Item label="Direction: ASC " value="ASC" />
-                        <Picker.Item label="Direction: DESC" value="DESC" />
-                    </Picker>
+                    <Controller name="limit" control={control} render={ ({ field: { value, onChange } }) => (
+                        <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "10"}>
+                            <Picker.Item label="Limit: 10" value="10" />
+                            <Picker.Item label="Limit: 25" value="25" />
+                            <Picker.Item label="Limit: 50" value="50" />
+                            <Picker.Item label="Limit: 100" value="100" />
+                        </Picker>
+                    )} />
+                    
+                    <Controller name="orderBy" control={control} render={ ({ field: { value, onChange } }) => (
+                        <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "title"}>
+                            <Picker.Item label="Sort by: title" value="title" />
+                            <Picker.Item label="Sort by: rating" value="rating" />
+                            <Picker.Item label="Sort by: year" value="year" />
+                        </Picker>
+                    )} />
+
+                    <Controller name="direction" control={control} render={ ({ field: { value, onChange } }) => (
+                        <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "ASC"}>
+                            <Picker.Item label="Direction: ASC " value="ASC" />
+                            <Picker.Item label="Direction: DESC" value="DESC" />
+                        </Picker>
+                    )} />
                 </View>
                 <View style={AppStyles.HorizontalDivCenter}>
-                    <TextInput style={AppStyles.CustomInput} placeholder="title" {...register("title")} />
-                    <TextInput style={AppStyles.CustomInput} placeholder="year" {...register("year")} />
-                    <TextInput style={AppStyles.CustomInput} placeholder="director" {...register("director")} />
-                    <TextInput style={AppStyles.CustomInput} placeholder="genre" {...register("genre")} />
+                    <Controller name="title" control={control} render={ ({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="title" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Controller name="year" control={control} render={ ({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="year" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Controller name="director" control={control} render={ ({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="director" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Controller name="genre" control={control} render={ ({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="genre" onChangeText={onChange} value={value || ""} />
+                    )} />
                     <Button title="Search" onPress={handleSubmit(submitSearch)} />
                 </View>
                 <View style={AppStyles.HorizontalDivRight}>
                     <Text>Page</Text>
-                    <TextInput style={AppStyles.CustomInputNum} placeholder="1" {...register("page")}/>
+                    <Controller name="page" control={control} render={ ({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""}/>
+                    )} />
                 </View>
             </View>
             
