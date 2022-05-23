@@ -98,11 +98,11 @@ export const CartProvider = ({children}) => {
     }
 
     //update cart on accessToken change
-    // useEffect(() => {
-    //     if (accessToken !== null)
-    //         downloadCart()
-    // }
-    // , [accessToken]);
+    useEffect(() => {
+        if (accessToken !== null)
+            downloadCart()
+    }
+    , [accessToken]);
 
     const value = {
         cartData, addToCart
