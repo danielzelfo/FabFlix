@@ -3,6 +3,7 @@ import {Route, Routes} from "react-router-dom";
 import {useUser} from "hook/User";
 import Movie from "pages/Movie";
 import SearchMovie from "pages/SearchMovie";
+import ShoppingCart from "pages/ShoppingCart";
 import Register from "pages/Register";
 import Login from "pages/Login";
 import Home from "pages/Home";
@@ -18,18 +19,19 @@ const Content = () => {
     return (
         <View style={AppStyles.ContentDiv}>
             {!accessToken ? 
-                //logged in
+                //not logged in
                 <Routes>
                     <Route path="/register" element={<Register/>}/>
                     <Route path="/login" element={<Login/>}/>
                     <Route path="/" element={<Login/>}/>
                 </Routes>
             :
-                //not logged in
+                //logged in
                 <Routes>
-                    <Route path="/" element={<Home/>}/>
                     <Route path="/movies/search" element={<SearchMovie/>}/>
                     <Route path="/movie/:movie_id" element={<Movie/>}/>
+                    <Route path="/cart" element={<ShoppingCart/>}/>
+                    <Route path="/" element={<Home/>}/>
                 </Routes>
             }
         </View>

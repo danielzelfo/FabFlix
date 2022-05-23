@@ -26,30 +26,25 @@ const NavBar = () => {
     }
 
     return (
+       
         <View style={AppStyles.MainNav}>
-            <View style={AppStyles.StyledNav}>
-                {!!accessToken && 
-                    <StyledNavLink to="/">
-                        Home
-                    </StyledNavLink>
+                {!accessToken ? 
+                    //not logged in
+                    <View style={AppStyles.StyledNav}>
+                        <StyledNavLink to="/login"> Login </StyledNavLink>
+                        <StyledNavLink to="/register"> Register </StyledNavLink>
+                    </View>
+                :
+                    //logged in
+                    <View style={AppStyles.StyledNav}>
+                        <View style={AppStyles.StyledNav}>
+                            <StyledNavLink to="/"> Home </StyledNavLink>
+                            <StyledNavLink to="/cart"> Cart </StyledNavLink>
+                        </View>
+                        <View style={AppStyles.LogoutButton}><Button  title="log out" onPress={logoutUser} /></View>
+                    </View>
                 }
-                {!accessToken && 
-                    <StyledNavLink to="/login">
-                        Login
-                    </StyledNavLink>
-                }
-                {!accessToken && 
-                    <StyledNavLink to="/register">
-                        Register
-                    </StyledNavLink>
-                } 
             </View>
-            {!!accessToken && 
-                <View style={AppStyles.LogoutButton}>
-                    <Button  title="log out" onPress={logoutUser} />
-                </View>
-            }
-        </View>
     );
 }
 

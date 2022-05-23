@@ -152,10 +152,9 @@ export const AppStyles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         justifyContent: "center",
+        alignItems: "center",
         width: "100%",
         height: "50px",
-        // position: "relative",
-        // left: "5px",
         backgroundColor: "#fff"
     },
     MainNav: {

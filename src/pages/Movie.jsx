@@ -1,16 +1,20 @@
 import React, { useState, useEffect }  from "react";
 import { AppStyles } from "style/Styles";
-import { View, Image, Text } from "react-native";
+import { View, Image, Text, Button, TextInput} from "react-native";
 import {useParams} from "react-router-dom";
 import {get_movie} from "backend/movies";
 import {useUser} from "hook/User";
+import {add_to_cart} from "backend/billing";
+import {useForm, Controller} from "react-hook-form";
 
 const Movie = () => {
-    const {movie_id} = useParams()
+    const {movie_id} = useParams();
 
     const {accessToken} = useUser();
 
     const [movieData, movieDataSetter] = useState({});
+
+    const {control, getValues, setValue, handleSubmit} = useForm();
 
     useEffect(() => 
         get_movie(movie_id, accessToken)
@@ -26,6 +30,18 @@ const Movie = () => {
             }
         }
         return num.toPrecision(3)/1 + " USD";
+    }
+    const addToCart = () => {
+        const quantity = getValues("quantity");
+        if (quantity == "0")
+            return;
+        
+        const payLoad = {
+            "movieId": parseInt(movie_id),
+            "quantity": parseInt(quantity)
+        }
+        console.log(payLoad);
+        add_to_cart(payLoad, accessToken);
     }
 
     return (
@@ -51,7 +67,11 @@ const Movie = () => {
 
                 <Text>Cast:</Text>
                 <Text>{ movieData.data.persons.map( person => person.name ).join(', ') }</Text>
-
+                
+                <Controller name="quantity" control={control} render={ ({ field: { value, onChange } }) => (
+                    <TextInput style={AppStyles.CustomInput} placeholder="quantity" onChangeText={onChange} value={value || "1"} />
+                )} />
+                <Button title="Add to cart" onPress={handleSubmit(addToCart)} />
             </View>
             }
         </View>
