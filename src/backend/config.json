@@ -13,6 +13,7 @@
   "billing": {
     "baseUrl": "http://localhost:8083",
     "get_cart": "/cart/retrieve",
-    "add_to_cart": "/cart/insert"
+    "add_to_cart": "/cart/insert",
+    "update_cart": "/cart/update"
   }
 }
