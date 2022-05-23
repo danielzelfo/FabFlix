@@ -57,8 +57,6 @@ export const CartProvider = ({children}) => {
             try {
                 await update_cart(payLoad, accessToken);
             } catch (err) {
-                console.log(1);
-                console.log(err.response.data.result.code);
                 if (err.response.data.result.code === 3001)
                     throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
                 
@@ -71,8 +69,6 @@ export const CartProvider = ({children}) => {
                 await add_to_cart(payLoad, accessToken);
                 return getMovieFromCart(movieId, await downloadCart()).quantity;
             } catch(err) {
-                console.log(2);
-                console.log(err.response.data.result.code);
                 if (err.response.data.result.code === 3002) {
                     // cart outdated
 
@@ -83,8 +79,6 @@ export const CartProvider = ({children}) => {
                     try {
                         await update_cart(payLoad, accessToken);
                     } catch (err) {
-                        console.log(3);
-                        console.log(err.response.data.result.code);
                         if (err.response.data.result.code === 3001)
                             throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
                         
