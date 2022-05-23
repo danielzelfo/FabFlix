@@ -16,6 +16,9 @@ const Movie = () => {
 
     const [movieData, movieDataSetter] = useState({});
 
+    // [text, color]
+    const [submitMessage, submitMessageSetter] = useState(["", ""]);
+
     const {control, getValues, handleSubmit} = useForm();
 
     useEffect(() => 
@@ -39,9 +42,13 @@ const Movie = () => {
         if (quantity === "0")
             return;
         if (quantity === undefined)
-            quantity = "1";
-
-        addToCart(parseInt(movie_id), parseInt(quantity));
+            quantity = 1;
+        else
+            quantity = parseInt(quantity);
+        
+        addToCart(parseInt(movie_id), quantity)
+            .then(new_quantity => submitMessageSetter([new_quantity !== quantity ? "Updated quantity to " + new_quantity + "." : "Added " + quantity + " to cart.", "blue"]))
+            .catch(err => submitMessageSetter([err.message, "red"]));
     }
 
     return (
@@ -72,6 +79,11 @@ const Movie = () => {
                     <TextInput style={AppStyles.CustomInput} placeholder="quantity" onChangeText={onChange} value={value || "1"} />
                 )} />
                 <Button title="Add to cart" onPress={handleSubmit(submitAddToCart)} />
+
+                {submitMessage && (
+                    <Text style={{color: submitMessage[1]}}>{submitMessage[0]}</Text>
+                )}
+
             </View>
             }
         </View>

@@ -53,37 +53,62 @@ export const CartProvider = ({children}) => {
         if (localMovie !== null) {
             payLoad.quantity += localMovie.quantity;
             
-            await update_cart(payLoad, accessToken)
-            downloadCart();
+
+            try {
+                await update_cart(payLoad, accessToken);
+            } catch (err) {
+                console.log(1);
+                console.log(err.response.data.result.code);
+                if (err.response.data.result.code === 3001)
+                    throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
+                
+                throw(Error("Failed to add to cart."));
+            }
+            return getMovieFromCart(movieId, await downloadCart()).quantity;
+            
         } else {
             try {
                 await add_to_cart(payLoad, accessToken);
-                downloadCart();
+                return getMovieFromCart(movieId, await downloadCart()).quantity;
             } catch(err) {
-
+                console.log(2);
+                console.log(err.response.data.result.code);
                 if (err.response.data.result.code === 3002) {
                     // cart outdated
 
                     let cart = await downloadCart();
-                    
                     const localMovie = getMovieFromCart(movieId, cart);
 
                     payLoad.quantity += localMovie.quantity;
-
-                    await update_cart(payLoad, accessToken);
-                    downloadCart();
+                    try {
+                        await update_cart(payLoad, accessToken);
+                    } catch (err) {
+                        console.log(3);
+                        console.log(err.response.data.result.code);
+                        if (err.response.data.result.code === 3001)
+                            throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
+                        
+                        throw(Error("Failed to add to cart."));
+                    }
+                    return getMovieFromCart(movieId, await downloadCart()).quantity;
                 }
+                
+                if (err.response.data.result.code === 3001) {
+                    throw(Error("Quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
+                }
+
+                throw(Error("Failed to add to cart."));
             }
         }
     
     }
 
     //update cart on accessToken change
-    useEffect(() => {
-        if (accessToken !== null)
-            downloadCart()
-    }
-    , [accessToken]);
+    // useEffect(() => {
+    //     if (accessToken !== null)
+    //         downloadCart()
+    // }
+    // , [accessToken]);
 
     const value = {
         cartData, addToCart
