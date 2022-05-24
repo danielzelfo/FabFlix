@@ -42,3 +42,16 @@ export async function update_cart(movieRequest, accessToken) {
 
     return Axios.request(options);
 }
+
+export async function clear_cart(accessToken) {    
+    const options = {
+        method: "POST",
+        baseURL: Config.billing.baseUrl,
+        url: Config.billing.clear_cart,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
+
+    return Axios.request(options);
+}

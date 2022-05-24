@@ -1,10 +1,10 @@
 import React from "react";
 import { AppStyles } from "style/Styles";
-import { View } from "react-native";
+import { View, Button } from "react-native";
 import {useCart} from "hook/Cart";
 
 const ShoppingCart = () => {
-    const {cartData} = useCart();
+    const {cartData, clearCart} = useCart();
 
     return (
         <View style={AppStyles.MainDiv}>
@@ -14,6 +14,8 @@ const ShoppingCart = () => {
                 {JSON.stringify(cartData)}
                 </h1>
             </View>
+
+            <Button title="Clear cart" onPress={clearCart} />
             
         </View>
     );

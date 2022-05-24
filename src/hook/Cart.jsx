@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import {get_cart, add_to_cart, update_cart} from "backend/billing";
+import {get_cart, add_to_cart, update_cart, clear_cart} from "backend/billing";
 import {useUser} from "hook/User";
 
 const localStorage = require("local-storage");
@@ -11,26 +11,38 @@ export const CartProvider = ({children}) => {
 
     const [cartData, cartDataSetter] = useState({total: 0, items: []});
 
+    const setCartData = (cart) => {
+        cartDataSetter(cart);
+        localStorage.set("cart_data", cart);
+    };
+
+    const clearCartLocal = () => {
+        setCartData({total: 0, items: []});
+    }
+
+    const clearCart = () => {
+        clearCartLocal();
+        clear_cart(accessToken);
+    }
+
     // set cart locally
-    const setCartData = (cartResponse) => {
+    const setCartDataResponse = (cartResponse) => {
         if (cartResponse.result.code === 3004) {
             // cart empty
-            cartDataSetter({total: 0, items: []});
-            localStorage.set("cart_data", cartData);
+            clearCartLocal();
             return
         }
         
-        cartDataSetter({
+        setCartData({
             total: cartResponse.total,
             items: cartResponse.items
         });
-        localStorage.set("cart_data", cartData);
     };
 
     // get cart from server
     async function downloadCart () {
         const response = await get_cart(accessToken);
-        setCartData(response.data);
+        setCartDataResponse(response.data);
         return response.data;
     }
 
@@ -105,7 +117,7 @@ export const CartProvider = ({children}) => {
     , [accessToken]);
 
     const value = {
-        cartData, addToCart
+        cartData, addToCart, clearCart
     }
 
     return (
