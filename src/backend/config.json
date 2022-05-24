@@ -15,6 +15,7 @@
     "get_cart": "/cart/retrieve",
     "add_to_cart": "/cart/insert",
     "update_cart": "/cart/update",
-    "clear_cart": "/cart/clear"
+    "clear_cart": "/cart/clear",
+    "delete_cart_item": "cart/delete"
   }
 }

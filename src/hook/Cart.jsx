@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import {get_cart, add_to_cart, update_cart, clear_cart} from "backend/billing";
+import {get_cart, add_to_cart, update_cart, clear_cart, delete_cart_item} from "backend/billing";
 import {useUser} from "hook/User";
 
 const localStorage = require("local-storage");
@@ -120,16 +120,21 @@ export const CartProvider = ({children}) => {
             throw(Error("Movie is not in cart."));
         }
 
-        try {
-            await update_cart(payLoad, accessToken);
-            
-        } catch (err) {
-            if (err.response.data.result.code === 3001)
-                throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
-            
-            throw(Error("Failed to update cart."));
+        if (quantity === 0) {
+            await delete_cart_item(movieId, accessToken);
+        } else {
+            try {
+                await update_cart(payLoad, accessToken);
+                
+            } catch (err) {
+                if (err.response.data.result.code === 3001)
+                    throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
+                
+                // if the cart is outdated, download and throw error
+                await downloadCart();
+                throw(Error("Failed to update cart."));
+            }
         }
-
         downloadCart();
     }
 

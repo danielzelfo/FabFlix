@@ -43,6 +43,19 @@ export async function update_cart(movieRequest, accessToken) {
     return Axios.request(options);
 }
 
+export async function delete_cart_item(movieId, accessToken) {    
+    const options = {
+        method: "DELETE",
+        baseURL: Config.billing.baseUrl,
+        url: `${Config.billing.delete_cart_item}/${movieId}`,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
+
+    return Axios.request(options);
+}
+
 export async function clear_cart(accessToken) {    
     const options = {
         method: "POST",
