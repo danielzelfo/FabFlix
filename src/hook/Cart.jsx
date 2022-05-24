@@ -109,15 +109,38 @@ export const CartProvider = ({children}) => {
     
     }
 
+    async function updateCart (movieId, quantity) {
+        const payLoad = {
+            movieId: movieId,
+            quantity: quantity
+        }
+
+        const localMovie = getMovieFromCart(movieId, cartData);
+        if (localMovie === null){
+            throw(Error("Movie is not in cart."));
+        }
+
+        try {
+            await update_cart(payLoad, accessToken);
+            
+        } catch (err) {
+            if (err.response.data.result.code === 3001)
+                throw(Error("New quantity (" + (payLoad.quantity) + ") is more than the maximum quantity."));
+            
+            throw(Error("Failed to update cart."));
+        }
+
+        downloadCart();
+    }
+
     //update cart on accessToken change
     useEffect(() => {
         if (accessToken !== null)
             downloadCart()
-    }
-    , [accessToken]);
+    } , [accessToken]);
 
     const value = {
-        cartData, addToCart, clearCart
+        cartData, addToCart, clearCart, updateCart
     }
 
     return (

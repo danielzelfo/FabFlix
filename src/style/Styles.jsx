@@ -178,5 +178,32 @@ export const AppStyles = StyleSheet.create({
         width: "100%",
         height: "350px",
         resizeMode: "contain"
-    }
+    },
+    CartQuantity: {
+        width: "50px", 
+        textAlign: "center",
+        backgroundColor: "white",
+        borderRadius: "5px",
+        marginLeft: "20px"
+    },
+    CartItems: {
+        gap: "10px"
+    },
+    CartItem: {
+        ...HorizontalDivStyle,
+        justifyContent: "right",
+        alignItems: "center",
+        textAlign: "center",
+        overflow: "hidden",
+        backgroundColor: "rgba(0,0,0,0.05)",
+        borderRadius: "5px"
+    },
+    HorizontalDivCart: {
+        ...HorizontalDivStyle,
+        justifyContent: "center",
+        gap: "100px",
+        padding: "20px",
+        flexWrap: "wrap",
+        minHeight: "calc(50vh/2)"
+    },
 });
