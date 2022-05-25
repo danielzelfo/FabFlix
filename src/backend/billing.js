@@ -68,3 +68,34 @@ export async function clear_cart(accessToken) {
 
     return Axios.request(options);
 }
+
+export async function order_payment(accessToken) {
+    
+    const options = {
+        method: "GET",
+        baseURL: Config.billing.baseUrl,
+        url: Config.billing.order_payment,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
+
+    return Axios.request(options);
+}
+
+export async function order_complete(accessToken, paymentIntentId) {
+    const payload = {
+        paymentIntentId: paymentIntentId
+    }
+    const options = {
+        method: "POST",
+        baseURL: Config.billing.baseUrl,
+        url: Config.billing.order_complete,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        },
+        data: payload
+    }
+
+    return Axios.request(options);
+}

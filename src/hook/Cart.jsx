@@ -145,7 +145,7 @@ export const CartProvider = ({children}) => {
     } , [accessToken]);
 
     const value = {
-        cartData, addToCart, clearCart, updateCart
+        cartData, addToCart, clearCart, updateCart, clearCartLocal
     }
 
     return (
