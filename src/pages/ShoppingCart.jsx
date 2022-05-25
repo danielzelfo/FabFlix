@@ -20,6 +20,8 @@ const ShoppingCart = () => {
 
     const { updateCart } = useCart();
 
+    const [itemTotals] = useState({});
+
     const addCartItems = () => {
         reset({
             data: 'cart'
@@ -27,6 +29,7 @@ const ShoppingCart = () => {
 
         for (let i = 0; i < cartData.items.length; ++i) {
             const item = cartData.items[i];
+            itemTotals[item.movieId] = item.unitPrice*item.quantity;
             append(item);
         }
     }
@@ -42,8 +45,13 @@ const ShoppingCart = () => {
     const updateQuantity = (index) => {
         const quantity = getValues(`cart.${index}.quantity`)
         const id = fields[index].movieId;
+        itemTotals[id] = fields[index].unitPrice*quantity;
         setIgnoreCartUpdate(true);
         updateCart(id, quantity);
+    }
+
+    const toDollars = (number) => {
+        return number.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
     }
 
     return (
@@ -65,6 +73,7 @@ const ShoppingCart = () => {
                                 <View style={{ width: "30px", height: "30px" }}>
                                     <Button onPress={() => updateQuantity(index)} title="✔" />
                                 </View>
+                                <Text style={{width: "100px"}}>{toDollars(itemTotals[item.movieId])}</Text>
                             </View>
                         ))
                         :
@@ -76,7 +85,7 @@ const ShoppingCart = () => {
                     </View>
                 </View>
                 <View>
-                    <Text>Total: <Text>{cartData.total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</Text></Text>
+                    <Text>Total: <Text>{toDollars(cartData.total)}</Text></Text>
                     <Button title="Checkout" onPress={() => navigate("/checkout")} />
                 </View>
             </View>

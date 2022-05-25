@@ -206,4 +206,9 @@ export const AppStyles = StyleSheet.create({
         flexWrap: "wrap",
         minHeight: "calc(50vh/2)"
     },
+    CartItemPrice: {
+        ...HorizontalDivStyle,
+        justifyContent: "right",
+        width: "120px"
+    }
 });
