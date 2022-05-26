@@ -110,6 +110,9 @@ export const CartProvider = ({children}) => {
     }
 
     async function updateCart (movieId, quantity) {
+
+        quantity = parseInt(quantity);
+
         const payLoad = {
             movieId: movieId,
             quantity: quantity
