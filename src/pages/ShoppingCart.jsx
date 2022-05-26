@@ -85,8 +85,10 @@ const ShoppingCart = () => {
                     </View>
                 </View>
                 <View>
-                    <Text>Total: <Text>{toDollars(cartData.total)}</Text></Text>
-                    <Button title="Checkout" onPress={() => navigate("/checkout")} />
+                    <Text style={{fontSize: "20px"}}>Total: <Text>{toDollars(cartData.total)}</Text></Text>
+                    <View style={{ marginTop: "10px" }}>
+                        <Button title="Checkout" onPress={() => navigate("/checkout")} />
+                    </View>
                 </View>
             </View>
         </View>
