@@ -14,16 +14,29 @@ const Movie = () => {
 
     const {addToCart} = useCart();
 
-    const [movieData, movieDataSetter] = useState({});
+    const [movieData, movieDataSetter] = useState(undefined);
 
     // [text, color]
     const [submitMessage, submitMessageSetter] = useState(["", ""]);
 
     const {control, getValues, handleSubmit} = useForm();
 
+    const [backgroundImg, setBackgroundImage] = useState("url(https://static.pexels.com/photos/1227/night-dark-blur-blurred.jpg)")
+    var MovieMainDiv = {
+        width: "100%",
+        position: "fixed",
+        flexDirection: "column",
+        alignItems: "center",
+        backgroundImage: backgroundImg,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        height: "calc(100vh - 51px)",
+        marginTop: "1px"
+    }
+
     useEffect(() => 
         get_movie(movie_id, accessToken)
-            .then(response => movieDataSetter(response))
+            .then(response => {movieDataSetter(response.data); setBackgroundImage(`url(https://image.tmdb.org/t/p/original${response.data.movie.backdropPath})`)})
     , []);
 
     const currencyFormat = (num) => {
@@ -52,28 +65,28 @@ const Movie = () => {
     }
 
     return (
-        <View style={AppStyles.MainDiv}>
-            {!!movieData.data &&
+        <View style={MovieMainDiv}>
+            {!!movieData &&
             <View style={AppStyles.MovieDetail}>
-                <Text style={AppStyles.H1Text}>{movieData.data.movie.title}</Text>
-                <Text>{movieData.data.movie.year}</Text>
-                <Text>{movieData.data.movie.director}</Text>
+                <Text style={AppStyles.H1Text}>{movieData.movie.title}</Text>
+                <Text>{movieData.movie.year}</Text>
+                <Text>{movieData.movie.director}</Text>
 
-                <Image source={{uri: `https://image.tmdb.org/t/p/original${movieData.data.movie.backdropPath}`}} style={AppStyles.Backdrop} />
+                <Image source={{uri: `https://image.tmdb.org/t/p/original${movieData.movie.posterPath}`}} style={AppStyles.Backdrop} />
                 
-                <Text>{movieData.data.movie.rating}/10 ({movieData.data.movie.numVotes})</Text>
+                <Text>{movieData.movie.rating}/10 ({movieData.movie.numVotes})</Text>
                 <View style={AppStyles.HorizontalDivCenter}>
-                    { movieData.data.genres.map( genre =>
+                    { movieData.genres.map( genre =>
                         <Text key={genre.id}> {genre.name} </Text>
                     ) }
                 </View>
 
-                <Text>{movieData.data.movie.overview}</Text>
-                {movieData.data.movie.budget !== 0 && <Text>Budget: {currencyFormat(movieData.data.movie.budget)}</Text>}
-                {movieData.data.movie.revenue !== 0 && <Text>Revenue: {currencyFormat(movieData.data.movie.revenue)}</Text>}
+                <Text>{movieData.movie.overview}</Text>
+                {movieData.movie.budget !== 0 && <Text>Budget: {currencyFormat(movieData.movie.budget)}</Text>}
+                {movieData.movie.revenue !== 0 && <Text>Revenue: {currencyFormat(movieData.movie.revenue)}</Text>}
 
                 <Text>Cast:</Text>
-                <Text>{ movieData.data.persons.map( person => person.name ).join(', ') }</Text>
+                <Text>{ movieData.persons.map( person => person.name ).join(', ') }</Text>
                 
                 <Controller name="quantity" control={control} render={ ({ field: { value, onChange } }) => (
                     <TextInput style={AppStyles.CustomInput} placeholder="quantity" onChangeText={onChange} value={value || "1"} />

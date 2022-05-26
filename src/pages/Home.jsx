@@ -1,12 +1,12 @@
-import React, { useState }  from "react";
-import {useForm, Controller} from "react-hook-form";
-import {search_movies} from "backend/movies";
-import {useUser} from "hook/User";
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { search_movies } from "backend/movies";
+import { useUser } from "hook/User";
 import { useNavigate } from "react-router-dom";
-import { View, Text, Button, TextInput } from "react-native";
-import {Picker} from '@react-native-picker/picker';
-import {AppStyles} from "style/Styles";
-import {Link} from "react-router-dom";
+import { View, Text, Button, TextInput, Image } from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import { AppStyles } from "style/Styles";
+import { Link } from "react-router-dom";
 
 
 const Home = () => {
@@ -19,13 +19,13 @@ const Home = () => {
         accessToken, setAccessToken
     } = useUser();
 
-    const {control, getValues, setValue, handleSubmit} = useForm();
+    const { control, getValues, setValue, handleSubmit } = useForm();
 
     // current page response data
     const [results, resultsSetter] = useState([]);
 
     // current page request data
-    const [pageData, pageDataSetter] = useState({});
+    const [pageData, pageDataSetter] = useState(undefined);
 
     const handleResultSuccess = (request, response) => {
         let movies = response.data.movies;
@@ -41,7 +41,7 @@ const Home = () => {
         // set the page if the response is not empty
         if (response.data.movies !== undefined) {
             handleResultSuccess(request, response);
-            for(let i = 0; i < field_names.length; ++i) {
+            for (let i = 0; i < field_names.length; ++i) {
                 setValue(field_names[i], request[field_names[i]] === undefined ? default_field_values[i] : request[field_names[i]]);
             }
         }
@@ -55,7 +55,7 @@ const Home = () => {
     const submitSearch = () => {
         const payLoad = {}
 
-        for(let i = 0; i < field_names.length; ++i) {
+        for (let i = 0; i < field_names.length; ++i) {
             let value = getValues(field_names[i]);
             if (value !== "" && !(default_field_values[i] !== "" && value === default_field_values[i]))
                 payLoad[field_names[i]] = value;
@@ -72,9 +72,9 @@ const Home = () => {
         Object.assign(payLoad, pageData);
         if (targetPage !== 1)
             payLoad.page = targetPage;
-        else if (payLoad.page !== undefined) 
+        else if (payLoad.page !== undefined)
             delete payLoad.page;
-        
+
         search_movies(payLoad, accessToken)
             .then(response => handlePageResultSuccess(payLoad, response))
             .catch(error => handleException(error))
@@ -100,7 +100,7 @@ const Home = () => {
             <View style={AppStyles.VerticalDiv}>
                 <Text style={AppStyles.H1Text}>FabFlix</Text>
                 <View style={AppStyles.HorizontalDivRight}>
-                    <Controller name="limit" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="limit" control={control} render={({ field: { value, onChange } }) => (
                         <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "10"}>
                             <Picker.Item label="Limit: 10" value="10" />
                             <Picker.Item label="Limit: 25" value="25" />
@@ -108,8 +108,8 @@ const Home = () => {
                             <Picker.Item label="Limit: 100" value="100" />
                         </Picker>
                     )} />
-                    
-                    <Controller name="orderBy" control={control} render={ ({ field: { value, onChange } }) => (
+
+                    <Controller name="orderBy" control={control} render={({ field: { value, onChange } }) => (
                         <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "title"}>
                             <Picker.Item label="Sort by: title" value="title" />
                             <Picker.Item label="Sort by: rating" value="rating" />
@@ -117,7 +117,7 @@ const Home = () => {
                         </Picker>
                     )} />
 
-                    <Controller name="direction" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="direction" control={control} render={({ field: { value, onChange } }) => (
                         <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "ASC"}>
                             <Picker.Item label="Direction: ASC " value="ASC" />
                             <Picker.Item label="Direction: DESC" value="DESC" />
@@ -125,66 +125,75 @@ const Home = () => {
                     )} />
                 </View>
                 <View style={AppStyles.HorizontalDivCenter}>
-                    <Controller name="title" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={AppStyles.CustomInput} placeholder="title" onChangeText={onChange} value={value || ""} />
                     )} />
-                    <Controller name="year" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={AppStyles.CustomInput} placeholder="year" onChangeText={onChange} value={value || ""} />
                     )} />
-                    <Controller name="director" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={AppStyles.CustomInput} placeholder="director" onChangeText={onChange} value={value || ""} />
                     )} />
-                    <Controller name="genre" control={control} render={ ({ field: { value, onChange } }) => (
+                    <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={AppStyles.CustomInput} placeholder="genre" onChangeText={onChange} value={value || ""} />
                     )} />
                     <Button title="Search" onPress={handleSubmit(submitSearch)} />
                 </View>
                 <View style={AppStyles.HorizontalDivRight}>
                     <Text>Page</Text>
-                    <Controller name="page" control={control} render={ ({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""}/>
+                    <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""} />
                     )} />
                 </View>
             </View>
-            
+
             {
-            results.length > 0 ?
-                <View style={AppStyles.ResultContainerDiv}>
-                    <View style={AppStyles.ResultTable}>
-                        <View style={AppStyles.ResultBody}>
-                            <View style={AppStyles.ResultRow}>
-                                <View style={AppStyles.ResultCell1}><Text style={AppStyles.BoldCenteredText}>Title</Text></View>
-                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Year</Text></View>
-                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Director</Text></View>
+                results.length > 0 ?
+                    <View style={AppStyles.ResultContainerDiv}>
+                        <View style={AppStyles.ResultTable}>
+                            <View style={AppStyles.ResultBody}>
+                                <View style={AppStyles.ResultRow}>
+                                    <View style={AppStyles.ResultCell0}><Text style={AppStyles.BoldCenteredText}>Title</Text></View>
+                                    <View style={AppStyles.ResultCell0}><Text style={AppStyles.BoldCenteredText}>Photo</Text></View>
+                                    <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Year</Text></View>
+                                    <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Director</Text></View>
+                                </View>
+                                {
+                                    results.map(result =>
+                                        <View style={AppStyles.ResultRow} key={result.id}>
+                                            <View style={AppStyles.ResultCell0}><Link to={`/movie/${result.id}`}><Text style={AppStyles.ResultCellText}>{result.title}</Text></Link></View>
+                                            <View style={AppStyles.ResultCell0}>
+                                                <Link to={`/movie/${result.id}`}><Image source={{ uri: `https://image.tmdb.org/t/p/original${result.posterPath}` }} style={AppStyles.Backdrop} /></Link>
+                                            </View>
+                                            <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.year}</Text></View>
+                                            <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.director}</Text></View>
+                                        </View>
+                                    )
+                                }
                             </View>
-                        {
-                        results.map( result =>
-                            <View style={AppStyles.ResultRow} key={result.id}>
-                                <View style={AppStyles.ResultCell1}><Link to={`/movie/${result.id}`}><Text style={AppStyles.ResultCellText}>{result.title}</Text></Link></View>
-                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.year}</Text></View>
-                                <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.director}</Text></View>
-                            </View>
-                        )
-                        }
+                        </View>
+                        <View style={AppStyles.HorizontalDivCenterDown}>
+                            <Button title="prev" onPress={prevPage} />
+                            <Button title="next" onPress={nextPage} />
                         </View>
                     </View>
-                    <View style={AppStyles.HorizontalDivCenterDown}>
-                        <Button title="prev" onPress={prevPage} />
-                        <Button title="next" onPress={nextPage} />
-                    </View>
-                </View>
-            :
-                <View style={AppStyles.ResultContainerDiv}>
-                    <View style={AppStyles.ResultTable}>
-                        <View style={AppStyles.ResultBody}>
-                            <View style={AppStyles.ResultRow} >
-                                <View style={AppStyles.ResultCell1} >
-                                    <Text style={AppStyles.ResultCellTextCentered}>No results</Text>
+                    :
+
+                    !pageData ?
+                        <View></View>
+                        :
+                        <View style={AppStyles.ResultContainerDiv}>
+                            <View style={AppStyles.ResultTable}>
+                                <View style={AppStyles.ResultBody}>
+                                    <View style={AppStyles.ResultRow} >
+                                        <View style={AppStyles.ResultCell1} >
+                                            <Text style={AppStyles.ResultCellTextCentered}>No results</Text>
+                                        </View>
+                                    </View>
                                 </View>
                             </View>
                         </View>
-                    </View>
-                </View>
+
             }
         </View>
     );

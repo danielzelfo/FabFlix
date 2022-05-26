@@ -4,7 +4,6 @@ import { Elements } from "@stripe/react-stripe-js";
 import {order_payment} from "backend/billing";
 import CheckoutForm from "../components/CheckoutForm";
 import {useUser} from "hook/User";
-import "../style/Stripe.css";
 import { AppStyles } from "style/Styles";
 import { View } from "react-native";
 import {useCart} from "hook/Cart";

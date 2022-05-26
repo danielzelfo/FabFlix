@@ -31,7 +31,7 @@ const VerticalDivStyle = {
 
 export const AppStyles = StyleSheet.create({
     MainDiv: {
-        width: "100%",
+        width: "calc(100% - 40px)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
@@ -43,8 +43,11 @@ export const AppStyles = StyleSheet.create({
         ...VerticalDivStyle,
         width: "75%",
         maxWidth: "650px",
+        maxHeight: "100%",
         padding: "40px",
-        boxShadow: "0 2px 10px rgb(0 0 0 / 20%)"
+        backgroundColor: "rgba(255,255,255,.85)",
+        marginTop: "25px",
+        overflowY: "scroll"
     },
     ResultContainerDiv: {
         ...VerticalDivStyle,
@@ -72,6 +75,12 @@ export const AppStyles = StyleSheet.create({
     ResultRow: {
         display: "table-row"
     },
+    ResultCell0: {
+        ...ResultCellStyle,
+        width: "30%",
+        padding: "5px",
+        textAlign: "center"
+    },
     ResultCell1: {
         ...ResultCellStyle,
         width: "60%",
@@ -80,7 +89,8 @@ export const AppStyles = StyleSheet.create({
     ResultCell23: {
         ...ResultCellStyle,
         width: "20%",
-        padding: "5px"
+        padding: "5px",
+        textAlign: "center"
     },
     ResultCellText: {
         whiteSpace: "nowrap",
@@ -153,7 +163,6 @@ export const AppStyles = StyleSheet.create({
         boxSizing: "border-box",
         width: "100%",
         minHeight: "calc(100vh - 50px)",
-        padding: "25px",
         backgroundColor: "#ffffff",
         boxShadow: "inset 0 3px 5px -3px #000000"
     },
