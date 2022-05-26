@@ -32,6 +32,8 @@ const VerticalDivStyle = {
 export const AppStyles = StyleSheet.create({
     MainDiv: {
         width: "calc(100% - 40px)",
+        marginTop: "20px",
+        marginLeft: "20px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center"
@@ -43,7 +45,7 @@ export const AppStyles = StyleSheet.create({
         ...VerticalDivStyle,
         width: "75%",
         maxWidth: "650px",
-        maxHeight: "100%",
+        maxHeight: "calc(100% - 50px)",
         padding: "40px",
         backgroundColor: "rgba(255,255,255,.85)",
         marginTop: "25px",
