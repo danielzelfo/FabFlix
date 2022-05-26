@@ -18,6 +18,8 @@
     "clear_cart": "/cart/clear",
     "delete_cart_item": "cart/delete",
     "order_payment": "/order/payment",
-    "order_complete": "/order/complete"
+    "order_complete": "/order/complete",
+    "order_list": "/order/list",
+    "order_detail": "/order/detail"
   }
 }

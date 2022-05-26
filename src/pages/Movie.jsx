@@ -24,7 +24,7 @@ const Movie = () => {
     useEffect(() => 
         get_movie(movie_id, accessToken)
             .then(response => movieDataSetter(response))
-    , [movie_id, accessToken, movieDataSetter]);
+    , []);
 
     const currencyFormat = (num) => {
         const values = [1000000000, 1000000, 1000];

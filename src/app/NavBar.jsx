@@ -40,6 +40,7 @@ const NavBar = () => {
                         <View style={AppStyles.StyledNav}>
                             <StyledNavLink to="/"> Home </StyledNavLink>
                             <StyledNavLink to="/cart"> Cart </StyledNavLink>
+                            <StyledNavLink to="/order-history"> Order History </StyledNavLink>
                         </View>
                         <View style={AppStyles.LogoutButton}><Button  title="log out" onPress={logoutUser} /></View>
                     </View>

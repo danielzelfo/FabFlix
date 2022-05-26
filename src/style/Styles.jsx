@@ -67,11 +67,13 @@ export const AppStyles = StyleSheet.create({
     },
     ResultCell1: {
         ...ResultCellStyle,
-        width: "60%"
+        width: "60%",
+        padding: "5px"
     },
     ResultCell23: {
         ...ResultCellStyle,
-        width: "20%"
+        width: "20%",
+        padding: "5px"
     },
     ResultCellText: {
         whiteSpace: "nowrap",

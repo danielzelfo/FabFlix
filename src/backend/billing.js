@@ -99,3 +99,30 @@ export async function order_complete(accessToken, paymentIntentId) {
 
     return Axios.request(options);
 }
+
+export async function order_list(accessToken) {
+    const options = {
+        method: "GET",
+        baseURL: Config.billing.baseUrl,
+        url: Config.billing.order_list,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
+
+    return Axios.request(options);
+}
+
+
+export async function order_detail(accessToken, saleId) {
+    const options = {
+        method: "GET",
+        baseURL: Config.billing.baseUrl,
+        url: `${Config.billing.order_detail}/${saleId}`,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
+
+    return Axios.request(options);
+}

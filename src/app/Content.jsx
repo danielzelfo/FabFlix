@@ -10,7 +10,8 @@ import Home from "pages/Home";
 import { AppStyles } from "style/Styles";
 import { View } from "react-native";
 import {Checkout} from "pages/Checkout";
-import {Complete} from "pages/Complete"
+import {Complete} from "pages/Complete";
+import {OrderHistory} from "pages/OrderHistory";
 const Content = () => {
 
     const {
@@ -34,6 +35,7 @@ const Content = () => {
                     <Route path="/cart" element={<ShoppingCart/>}/>
                     <Route path="/checkout" element={<Checkout/>}/>
                     <Route path="/complete" element={<Complete/>}/>
+                    <Route path="/order-history" element={<OrderHistory/>}/>
                     <Route path="/" element={<Home/>}/>
                 </Routes>
             }
