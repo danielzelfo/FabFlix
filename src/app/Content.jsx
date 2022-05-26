@@ -2,7 +2,6 @@ import React from "react";
 import {Route, Routes} from "react-router-dom";
 import {useUser} from "hook/User";
 import Movie from "pages/Movie";
-import SearchMovie from "pages/SearchMovie";
 import ShoppingCart from "pages/ShoppingCart";
 import Register from "pages/Register";
 import Login from "pages/Login";
@@ -30,7 +29,6 @@ const Content = () => {
             :
                 //logged in
                 <Routes>
-                    <Route path="/movies/search" element={<SearchMovie/>}/>
                     <Route path="/movie/:movie_id" element={<Movie/>}/>
                     <Route path="/cart" element={<ShoppingCart/>}/>
                     <Route path="/checkout" element={<Checkout/>}/>

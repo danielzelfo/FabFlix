@@ -54,7 +54,7 @@ const Movie = () => {
     return (
         <View style={AppStyles.MainDiv}>
             {!!movieData.data &&
-            <View style={AppStyles.VerticalDiv}>
+            <View style={AppStyles.MovieDetail}>
                 <Text style={AppStyles.H1Text}>{movieData.data.movie.title}</Text>
                 <Text>{movieData.data.movie.year}</Text>
                 <Text>{movieData.data.movie.director}</Text>

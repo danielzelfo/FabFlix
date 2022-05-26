@@ -39,6 +39,13 @@ export const AppStyles = StyleSheet.create({
     VerticalDiv: {
         ...VerticalDivStyle
     },
+    MovieDetail: {
+        ...VerticalDivStyle,
+        width: "75%",
+        maxWidth: "650px",
+        padding: "40px",
+        boxShadow: "0 2px 10px rgb(0 0 0 / 20%)"
+    },
     ResultContainerDiv: {
         ...VerticalDivStyle,
         width: "calc(100% - 100px)"
