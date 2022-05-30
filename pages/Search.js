@@ -176,20 +176,22 @@ const SearchScreen = ({ route, navigation }) => {
                 )}
                 ItemSeparatorComponent={movieDivider}
             />
-            <View style={styles.HorizontalDivCenter} >
-                <View style={styles.PagingButton1}>
-                    <Button color="#841584" title="prev" onPress={prevPage} />
+            {results.length > 0 &&
+                <View style={styles.HorizontalDivCenter} >
+                    <View style={styles.PagingButton1}>
+                        <Button color="#841584" title="prev" onPress={prevPage} />
+                    </View>
+                    <View style={styles.PagingPage}>
+                        <Text>Page</Text>
+                        <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
+                            <TextInput placeholder="1" onChangeText={onChange} value={(value || "").toString()} />
+                        )} />
+                    </View>
+                    <View style={styles.PagingButton2} >
+                        <Button color="#841584" title="next" onPress={nextPage} />
+                    </View>
                 </View>
-                <View style={styles.PagingPage}>
-                    <Text>Page</Text>
-                    <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput placeholder="1" onChangeText={onChange} value={(value || "").toString()} />
-                    )} />
-                </View>
-                <View style={styles.PagingButton2} >
-                    <Button color="#841584" title="next" onPress={nextPage} />
-                </View>
-            </View>
+            }
         </View>
     );
 };
