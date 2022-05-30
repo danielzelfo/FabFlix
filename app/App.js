@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
-import RegisterScreen from './Register';
-import SearchScreen from './Search';
+import RegisterScreen from '../pages/Register';
+import SearchScreen from '../pages/Search';
 import { loginPost } from '../backend/idm';
 
 const LoginScreen = ({ navigation }) => {
