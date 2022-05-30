@@ -160,7 +160,7 @@ const SearchScreen = ({ route, navigation }) => {
                             <View style={styles.subContainer} flexDirection='row'>
                                 <Image style={styles.thumbnail}
                                     source={{
-                                        uri: `https://image.tmdb.org/t/p/original${item.posterPath}`,
+                                        uri: `https://image.tmdb.org/t/p/w200${item.posterPath}`,
                                     }} />
                                 <View style={styles.MovieSearchDetail}>
                                     <Text style={{ fontSize: 20, margin: 10 }}>

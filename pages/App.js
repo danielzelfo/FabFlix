@@ -61,7 +61,7 @@ const MyStack = () => {
         <Stack.Screen
           name="Home"
           component={LoginScreen}
-          options={{ title: 'AwesomeProject' }}
+          options={{ title: 'FabFlix' }}
         />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
