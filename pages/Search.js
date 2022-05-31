@@ -153,7 +153,8 @@ const SearchScreen = ({ route, navigation }) => {
                     <View style={styles.container}>
                         <TouchableHighlight
                             onPress={() => {
-                                alert("Key: " + item.id + "\nValue: " + item.title);
+                                // alert("Key: " + item.id + "\nValue: " + item.title);
+                                navigation.navigate("Movie", {movie_id: item.id})
                             }}
                             underlayColor="white">
                             <View style={styles.subContainer} flexDirection='row'>
@@ -197,7 +198,8 @@ const SearchScreen = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
     HorizontalDivCenter: {
-        ...HorizontalDivStyle,
+        display: "flex",
+        flexDirection: "row",
         justifyContent: "center",
         alignItems: "center"
     },
@@ -213,7 +215,8 @@ const styles = StyleSheet.create({
         marginLeft: (Dimensions.get('window').width - 250) / 2
     },
     PagingPage: {
-        ...HorizontalDivStyle,
+        display: "flex",
+        flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
         width: 100,

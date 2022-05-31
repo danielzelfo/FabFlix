@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import RegisterScreen from '../pages/Register';
 import SearchScreen from '../pages/Search';
 import LoginScreen from '../pages/Login';
+import MovieScreen from '../pages/Movie';
 import {UserProvider} from "../hook/User";
 
 const Stack = createNativeStackNavigator();
@@ -16,6 +17,7 @@ const MyStack = () => {
           <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'FabFlix' }} />
           <Stack.Screen name="Register" component={RegisterScreen} />
           <Stack.Screen name="Search" component={SearchScreen} />
+          <Stack.Screen name="Movie" component={MovieScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </UserProvider>

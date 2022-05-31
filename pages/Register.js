@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
 import { registerRequest } from '../backend/idm';
 
 const RegisterScreen = ({ route, navigation }) => {
-  const [email, onChangeEmail] = React.useState(null);
-  const [password, onChangePassword] = React.useState(null);
-  const [passwordRe, onChangePasswordRe] = React.useState(null);
+  const [email, onChangeEmail] = useState(null);
+  const [password, onChangePassword] = useState(null);
+  const [passwordRe, onChangePasswordRe] = useState(null);
 
   const handleRegisterError = (error) => {
     if (error.result.code === 1011)

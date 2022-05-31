@@ -16,16 +16,16 @@ export async function search_movies(movieRequest, accessToken) {
 }
 
 
-// export async function get_movie(movie_id, accessToken) {
+export async function get_movie(movie_id, accessToken) {
     
-//     const options = {
-//         method: "GET",
-//         baseURL: Config.movies.baseUrl,
-//         url: `${Config.movies.movie}${movie_id}`,
-//         headers: {
-//             Authorization: "Bearer " + accessToken
-//         }
-//     }
+    const options = {
+        method: "GET",
+        baseURL: "http://akera.ddns.net:8083",
+        url: `/movie/${movie_id}`,
+        headers: {
+            Authorization: "Bearer " + accessToken
+        }
+    }
 
-//     return Axios.request(options);
-// }
+    return Axios.request(options);
+}
