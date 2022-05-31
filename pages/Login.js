@@ -1,13 +1,20 @@
 import React, {useState} from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
 import { login } from '../backend/idm';
+import {useUser} from "../hook/User";
 
 const LoginScreen = ({ navigation }) => {
     const [email, onChangeEmail] = useState(null);
     const [password, onChangePassword] = useState(null);
 
+    const {
+        setAccessToken, setRefreshToken
+    } = useUser();
+
     const handleLoginSucess = (response) => {
-        navigation.navigate("Search", { accessToken: response.data.accessToken, refreshToken: response.data.refreshToken });
+        setAccessToken(response.data.accessToken);
+        setRefreshToken(response.data.refreshToken);
+        navigation.navigate("Search");
     }
 
     const handleLoginFail = (error) => {

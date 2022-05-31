@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { Picker } from '@react-native-picker/picker';
 import { search_movies } from '../backend/movies';
 import { HorizontalDivStyle } from '../styles/styles';
+import {useUser} from "../hook/User";
 
 const movieDivider = () => {
     return (
@@ -18,7 +19,8 @@ const movieDivider = () => {
 }
 
 const SearchScreen = ({ route, navigation }) => {
-    const { accessToken, refreshToken } = route.params;
+
+    const {accessToken, refreshToken, setAccessToken} = useUser();
 
     const field_names = ["title", "year", "director", "genre", "limit", "page", "orderBy", "direction"];
     const default_field_values = ["", "", "", "", "10", "1", "title", "ASC"]
