@@ -105,6 +105,23 @@ const SearchScreen = ({ route, navigation }) => {
         <View style={styles.container}>
             <View>
                 <View style={styles.HorizontalDivCenter}>
+                    <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={styles.CustomInput} placeholder="title" onChangeText={onChange} value={(value || "").toString()} />
+                    )} />
+                    <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={styles.CustomInput} placeholder="year" onChangeText={onChange} value={(value || "").toString()} />
+                    )} />
+                    <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={styles.CustomInput} placeholder="director" onChangeText={onChange} value={(value || "").toString()} />
+                    )} />
+                    <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={styles.CustomInput} placeholder="genre" onChangeText={onChange} value={(value || "").toString()} />
+                    )} />
+                    <View style={styles.CustomInput}>
+                        <Button title="Search" onPress={handleSubmit(submitSearch)} />
+                    </View>
+                </View>
+                <View style={styles.HorizontalDivCenter}>
                     <Controller name="limit" control={control} render={({ field: { value, onChange } }) => (
                         <Picker style={styles.SelectStyle1} onValueChange={onChange} value={(value || "10").toString()}>
                             <Picker.Item style={styles.SelectStyleItem} label="Limit: 10" value="10" />
@@ -128,23 +145,6 @@ const SearchScreen = ({ route, navigation }) => {
                             <Picker.Item style={styles.SelectStyleItem} label="DESC" value="DESC" />
                         </Picker>
                     )} />
-                </View>
-                <View style={styles.HorizontalDivCenter}>
-                    <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="title" onChangeText={onChange} value={(value || "").toString()} />
-                    )} />
-                    <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="year" onChangeText={onChange} value={(value || "").toString()} />
-                    )} />
-                    <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="director" onChangeText={onChange} value={(value || "").toString()} />
-                    )} />
-                    <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="genre" onChangeText={onChange} value={(value || "").toString()} />
-                    )} />
-                    <View style={styles.CustomInput}>
-                        <Button title="Search" onPress={handleSubmit(submitSearch)} />
-                    </View>
                 </View>
             </View>
             <FlatList
