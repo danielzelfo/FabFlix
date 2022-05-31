@@ -11,11 +11,7 @@ const MyStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen
-          name="Home"
-          component={LoginScreen}
-          options={{ title: 'FabFlix' }}
-        />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'FabFlix' }} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
       </Stack.Navigator>

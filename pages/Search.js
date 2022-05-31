@@ -54,7 +54,7 @@ const SearchScreen = ({ route, navigation }) => {
 
     const handleException = (error) => {
         console.log(error);
-        navigation.navigate("Home");
+        navigation.navigate("Login");
         setAccessToken(null);
     }
 

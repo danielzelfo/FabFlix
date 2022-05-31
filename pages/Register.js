@@ -1,13 +1,21 @@
 import React, { Component } from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
-import { registerPost } from '../backend/idm';
+import { registerRequest } from '../backend/idm';
 
-const RegisterInput = ({ navigation }) => {
+const RegisterScreen = ({ route, navigation }) => {
   const [email, onChangeEmail] = React.useState(null);
   const [password, onChangePassword] = React.useState(null);
   const [passwordRe, onChangePasswordRe] = React.useState(null);
 
+  const handleRegisterError = (error) => {
+    if (error.result.code === 1011)
+      alert(error.result.message + ". Please login.")
+    else
+      alert(error.result.message)
+  }
+
   return (
+    <View style={styles.container}>
     <View>
       <TextInput
         style={styles.input}
@@ -33,17 +41,23 @@ const RegisterInput = ({ navigation }) => {
         <Button
           onPress={
             async () => {
-              if (password !== passwordRe) {
-                alert("Two passwords should be identical!");
-              } else {
-                const registerResult = await registerPost(email, password);
-                //   alert("result code: " + registerResult.result.code);
-                if (registerResult.result.code == 1010) {
-                  alert("Registration succeeded!");
-                } else {
-                  alert("Registration failed!");
-                }
+              if (email === null || email === "") {
+                handleRegisterError({ result: { message: "Email is required" } });
+                return;
               }
+              if (password === null || password === "" || passwordRe === null || passwordRe === "") {
+                handleRegisterError({ result: { message: "Password is required" } });
+                return;
+              }
+              if (password !== passwordRe) {
+                handleRegisterError({ result: { message: "Two passwords should be identical!" } });
+                return;
+              }
+
+              registerRequest(email, password)
+                .then(response => navigation.navigate("Login"))
+                .catch(error => {console.log(error); handleRegisterError(error.response.data)})
+
             }
           }
           title="SIGN UP"
@@ -51,20 +65,9 @@ const RegisterInput = ({ navigation }) => {
         />
       </View>
     </View>
+    </View>
   );
 };
-
-class RegisterScreen extends Component {
-
-  render() {
-
-    return (
-      <View style={styles.container}>
-        <RegisterInput />
-      </View>
-    );
-  }
-}
 
 const styles = StyleSheet.create({
   container: {

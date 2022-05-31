@@ -1,10 +1,26 @@
 import React, {useState} from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
-import { loginPost } from '../backend/idm';
+import { login } from '../backend/idm';
 
 const LoginScreen = ({ navigation }) => {
     const [email, onChangeEmail] = useState(null);
     const [password, onChangePassword] = useState(null);
+
+    const handleLoginSucess = (response) => {
+        navigation.navigate("Search", { accessToken: response.data.accessToken, refreshToken: response.data.refreshToken });
+    }
+
+    const handleLoginFail = (error) => {
+        let errormsg = error.result.message;
+        let errorcode = error.result.code;
+        if (errorcode === 1021) {
+            alert(errormsg + ". Please register ");
+            // setErrorMessage([errormsg + ". Please register ", true]);
+        } else {
+            alert(errormsg);
+            // setErrorMessage([errormsg, false]);
+        }
+    }
 
     return (
 
@@ -25,13 +41,18 @@ const LoginScreen = ({ navigation }) => {
             <View style={styles.buttonContainer}>
                 <Button
                     onPress={
-                        async () => {
-                            const result = await loginPost(email, password);
-                            if (result.result.code == 1020) {
-                                navigation.navigate("Search", { accessToken: result.accessToken, refreshToken: result.refreshToken });
-                            } else {
-                                alert("Please register first");
+                        () => {
+                            if (email === null || email === "") {
+                                handleLoginFail({result: {message: "Email is required"}});
+                                return;
                             }
+                            if (password === null || password === "") {
+                                handleLoginFail({result: {message: "Password is required"}});
+                                return;
+                            }
+                            login(email, password)
+                                .then(response => handleLoginSucess(response))
+                                .catch(error => handleLoginFail(error.response.data))
                         }
                     }
                     title="LOGIN"
