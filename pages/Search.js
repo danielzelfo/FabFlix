@@ -1,4 +1,4 @@
-import { Dimensions, Text, FlatList, StyleSheet, View, TouchableHighlight, Image, Button, TextInput } from 'react-native';
+import { Dimensions, Text, FlatList, StyleSheet, View, TouchableHighlight, Image, Button, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from '@react-native-picker/picker';
@@ -22,8 +22,8 @@ const SearchScreen = ({ route, navigation }) => {
 
     const {accessToken, refreshToken, setAccessToken} = useUser();
 
-    const field_names = ["title", "year", "director", "genre", "limit", "page", "orderBy", "direction"];
-    const default_field_values = ["", "", "", "", "10", "1", "title", "ASC"]
+    const field_names = ["title", "year", "director", "genre", "page", "orderBy", "direction"];
+    const default_field_values = ["", "", "", "", "1", "title", "ASC"]
 
 
     const { control, getValues, setValue, handleSubmit } = useForm();
@@ -61,7 +61,9 @@ const SearchScreen = ({ route, navigation }) => {
     }
 
     const submitSearch = () => {
-        const payLoad = {}
+        const payLoad = {
+            limit: 10
+        }
 
         for (let i = 0; i < field_names.length; ++i) {
             let value = getValues(field_names[i]);
@@ -119,22 +121,11 @@ const SearchScreen = ({ route, navigation }) => {
                     <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={styles.CustomInput} placeholder="genre" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
-                    <View style={styles.CustomInput}>
-                        <Button title="Search" onPress={handleSubmit(submitSearch)} />
-                    </View>
+                    
                 </View>
                 <View style={styles.HorizontalDivCenter}>
-                    <Controller name="limit" control={control} render={({ field: { value, onChange } }) => (
-                        <Picker style={styles.SelectStyle1} onValueChange={onChange} value={(value || "10").toString()}>
-                            <Picker.Item style={styles.SelectStyleItem} label="Limit: 10" value="10" />
-                            <Picker.Item style={styles.SelectStyleItem} label="Limit: 25" value="25" />
-                            <Picker.Item style={styles.SelectStyleItem} label="Limit: 50" value="50" />
-                            <Picker.Item style={styles.SelectStyleItem} label="Limit: 100" value="100" />
-                        </Picker>
-                    )} />
-
                     <Controller name="orderBy" control={control} render={({ field: { value, onChange } }) => (
-                        <Picker style={styles.SelectStyle1} onValueChange={onChange} value={(value || "title").toString()}>
+                        <Picker style={styles.SelectStyle1} onValueChange={onChange} selectedValue={(value || "title").toString()}>
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: title" value="title" />
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: rating" value="rating" />
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: year" value="year" />
@@ -142,11 +133,17 @@ const SearchScreen = ({ route, navigation }) => {
                     )} />
 
                     <Controller name="direction" control={control} render={({ field: { value, onChange } }) => (
-                        <Picker style={styles.SelectStyle2} onValueChange={onChange} value={(value || "ASC").toString()}>
+                        <Picker style={styles.SelectStyle2} onValueChange={onChange} selectedValue={(value || "ASC").toString()}>
                             <Picker.Item style={styles.SelectStyleItem} label="ASC" value="ASC" />
                             <Picker.Item style={styles.SelectStyleItem} label="DESC" value="DESC" />
                         </Picker>
                     )} />
+
+                    <View style={styles.SubmitButton}>
+                        <TouchableOpacity style={styles.SubmitButtonBtn} activeOpacity={0.75} onPress={handleSubmit(submitSearch)}>
+                            <Text style={styles.SubmitButtonTxt}>Search</Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
             <FlatList
@@ -224,19 +221,40 @@ const styles = StyleSheet.create({
     },
     SelectStyle1: {
         backgroundColor: "white",
-        width: 11 * Dimensions.get('window').width / 32
+        width: 7* Dimensions.get('window').width / 16
     },
     SelectStyle2: {
         backgroundColor: "white",
-        width: 5 * Dimensions.get('window').width / 16
+        width: 5* Dimensions.get('window').width / 16
+    },
+    SubmitButton: {
+        width: Dimensions.get('window').width / 4,
+        height: 50
+    },
+    SubmitButtonBtn: {
+        flexDirection: 'row', 
+        height: 46, 
+        backgroundColor: '#ff5c5c',
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation:3,
+        borderRadius: 5,
+        margin: 2
+    },
+    SubmitButtonTxt: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: "white"
     },
     SelectStyleItem: {
-        fontSize: 14
+        fontSize: 14,
+        height: "center",
+        justifyContent: "center"
     },
     CustomInput: {
         alignItems: "center",
         justifyContent: "center",
-        width: Dimensions.get('window').width / 5
+        width: Dimensions.get('window').width / 4
     },
     MovieSearchDetail: {
         width: 7*Dimensions.get('window').width/8 - 20,

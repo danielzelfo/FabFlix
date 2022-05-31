@@ -26,11 +26,9 @@ const LoginScreen = ({ navigation }) => {
         let errormsg = error.result.message;
         let errorcode = error.result.code;
         if (errorcode === 1021) {
-            alert(errormsg + ". Please register ");
-            // setErrorMessage([errormsg + ". Please register ", true]);
+            alert(errormsg + ". Please register.");
         } else {
             alert(errormsg);
-            // setErrorMessage([errormsg, false]);
         }
     }
 
