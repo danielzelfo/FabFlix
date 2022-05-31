@@ -1,21 +1,29 @@
-import React, { createContext, useState, useContext } from "react";
-
-// const localStorage = require("local-storage");
+import React, { createContext, useState, useContext, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserContext = createContext({});
 
 export const UserProvider = ({children}) => {
-    const [accessToken, accessTokenSetter] = useState(null);//localStorage.get("access_token"));
-    const [refreshToken, refreshTokenSetter] = useState(null);//localStorage.get("refresh_token"));
+    const [accessToken, accessTokenSetter] = useState(null);
+    const [refreshToken, refreshTokenSetter] = useState(null);
+
+    useEffect(() => { 
+        AsyncStorage.getItem("access_token")
+            .then(res => accessTokenSetter(res));
+        
+        AsyncStorage.getItem("refresh_token")
+            .then(res => refreshTokenSetter(res));
+        
+    }, []);
 
     const setAccessToken = (accessToken) => {
         accessTokenSetter(accessToken);
-        //localStorage.set("access_token", accessToken)
+        AsyncStorage.setItem("access_token", accessToken);
     }
 
     const setRefreshToken = (refreshToken) => {
         refreshTokenSetter(refreshToken);
-        //localStorage.set("refresh_token", refreshToken)
+        AsyncStorage.setItem("refresh_token", refreshToken);
     }
 
     const value = {

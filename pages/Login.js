@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Button, TextInput, StyleSheet, View } from 'react-native';
 import { login } from '../backend/idm';
 import {useUser} from "../hook/User";
@@ -8,8 +8,13 @@ const LoginScreen = ({ navigation }) => {
     const [password, onChangePassword] = useState(null);
 
     const {
-        setAccessToken, setRefreshToken
+        accessToken, setAccessToken, setRefreshToken
     } = useUser();
+
+    useEffect(() => {
+        if (accessToken !== null)
+            navigation.navigate("Search");
+    }, [accessToken]);
 
     const handleLoginSucess = (response) => {
         setAccessToken(response.data.accessToken);
