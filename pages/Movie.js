@@ -1,15 +1,15 @@
-import React, { useState, useEffect }  from "react";
-import { Dimensions, ScrollView, StatusBar, View, Image, Text, StyleSheet, ImageBackground, useColorScheme} from "react-native";
-import {get_movie} from "../backend/movies";
-import {useUser} from "../hook/User";
+import React, { useState, useEffect } from "react";
+import { Dimensions, ScrollView, StatusBar, View, Image, Text, StyleSheet, ImageBackground, useColorScheme } from "react-native";
+import { get_movie } from "../backend/movies";
+import { useUser } from "../hook/User";
 
-const MovieScreen = ({route, navigation}) => {
+const MovieScreen = ({ route, navigation }) => {
 
     const theme = useColorScheme();
-    
+
     const { movie_id } = route.params;
 
-    const {accessToken} = useUser();
+    const { accessToken } = useUser();
 
     const [movieData, movieDataSetter] = useState(undefined);
 
@@ -20,7 +20,7 @@ const MovieScreen = ({route, navigation}) => {
     useEffect(() => {
         async function func() {
             get_movie(movie_id, accessToken)
-                .then(response => {movieDataSetter(response.data); setBackgroundImage(`https://image.tmdb.org/t/p/original${response.data.movie.backdropPath}`)})
+                .then(response => { movieDataSetter(response.data); setBackgroundImage(`https://image.tmdb.org/t/p/original${response.data.movie.backdropPath}`) })
         }
         func();
     }, []);
@@ -30,10 +30,10 @@ const MovieScreen = ({route, navigation}) => {
         const words = ["Billion", "Million", "Thousand"];
         for (let i = 0; i < values.length; ++i) {
             if (num >= values[i]) {
-                return (num/values[i]).toPrecision(3)/1 + " " + words[i] + " USD";
+                return (num / values[i]).toPrecision(3) / 1 + " " + words[i] + " USD";
             }
         }
-        return num.toPrecision(3)/1 + " USD";
+        return num.toPrecision(3) / 1 + " USD";
     }
 
     const styles = StyleSheet.create({
@@ -46,7 +46,7 @@ const MovieScreen = ({route, navigation}) => {
         DefaultDiv: {
             marginTop: 10,
             alignItems: "center"
-        },  
+        },
         GenresContainer: {
             display: "flex",
             flexDirection: "row",
@@ -64,7 +64,7 @@ const MovieScreen = ({route, navigation}) => {
         MovieDetailContainer: {
             height: Dimensions.get('window').height - 125,
             width: Dimensions.get('window').width - 50,
-    
+
         },
         MovieDetail: {
             backgroundColor: theme === "light" ? "rgba(255,255,255,.85)" : "#222831",
@@ -77,7 +77,7 @@ const MovieScreen = ({route, navigation}) => {
         },
         Backdrop: {
             width: Dimensions.get('window').width - 50 - 80,
-            height: (Dimensions.get('window').width - 50 - 80)*16/9,
+            height: (Dimensions.get('window').width - 50 - 80) * 16 / 9,
             paddingBottom: StatusBar.currentHeight,
             resizeMode: "contain"
         },
@@ -85,47 +85,47 @@ const MovieScreen = ({route, navigation}) => {
             flex: 1,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: theme === "light" ? "#EEEEEE" : "#222831" 
+            backgroundColor: theme === "light" ? "#EEEEEE" : "#222831"
         }
     });
 
     return (
         <ImageBackground source={image} resizeMode="cover" style={styles.MovieMainDiv}>
             {!!movieData &&
-            <View style={styles.MovieDetailContainer}>
-                <ScrollView style={styles.MovieDetail}>
-                    <View style={{alignItems: "center", padding: 20}}>
-                        <Text style={styles.H1Text}>{movieData.movie.title}</Text>
-                        
-                        <View style={styles.DefaultDiv}>
-                            <Text style={styles.ImpText}>{movieData.movie.year}</Text>
-                            <Text style={styles.ImpText}>{movieData.movie.director}</Text>
-                        </View>
-                        <Image source={{uri: `https://image.tmdb.org/t/p/original${movieData.movie.posterPath}`}} style={styles.Backdrop} />
+                <View style={styles.MovieDetailContainer}>
+                    <ScrollView style={styles.MovieDetail}>
+                        <View style={{ alignItems: "center", padding: 20 }}>
+                            <Text style={styles.H1Text}>{movieData.movie.title}</Text>
 
-                        {movieData.movie.numVotes !== 0 && <Text style={styles.ImpText}>{movieData.movie.rating}/10 ({movieData.movie.numVotes})</Text>}
-                        <View style={styles.GenresContainer}>
-                            { movieData.genres.map( genre =>
-                                <Text key={genre.id} style={styles.Genre}> {genre.name} </Text>
-                            ) }
+                            <View style={styles.DefaultDiv}>
+                                <Text style={styles.ImpText}>{movieData.movie.year}</Text>
+                                <Text style={styles.ImpText}>{movieData.movie.director}</Text>
+                            </View>
+                            <Image source={{ uri: `https://image.tmdb.org/t/p/original${movieData.movie.posterPath}` }} style={styles.Backdrop} />
+
+                            {movieData.movie.numVotes !== 0 && <Text style={styles.ImpText}>{movieData.movie.rating}/10 ({movieData.movie.numVotes})</Text>}
+                            <View style={styles.GenresContainer}>
+                                {movieData.genres.map(genre =>
+                                    <Text key={genre.id} style={styles.Genre}> {genre.name} </Text>
+                                )}
+                            </View>
+
+                            <View style={styles.DefaultDiv}>
+                                <Text style={styles.RestText}>{movieData.movie.overview}</Text>
+                            </View>
+
+                            <View style={styles.DefaultDiv}>
+                                {movieData.movie.budget !== 0 && <Text style={styles.RestText}>Budget: {currencyFormat(movieData.movie.budget)}</Text>}
+                                {movieData.movie.revenue !== 0 && <Text style={styles.RestText}>Revenue: {currencyFormat(movieData.movie.revenue)}</Text>}
+                            </View>
+
+                            <View style={styles.DefaultDiv}>
+                                <Text style={styles.RestText}>Cast:</Text>
+                                <Text style={styles.RestText}>{movieData.persons.map(person => person.name).join(', ')}</Text>
+                            </View>
                         </View>
-                        
-                        <View style={styles.DefaultDiv}>
-                            <Text style={styles.RestText}>{movieData.movie.overview}</Text>
-                        </View>
-                        
-                        <View style={styles.DefaultDiv}>
-                            {movieData.movie.budget !== 0 && <Text style={styles.RestText}>Budget: {currencyFormat(movieData.movie.budget)}</Text>}
-                            {movieData.movie.revenue !== 0 && <Text style={styles.RestText}>Revenue: {currencyFormat(movieData.movie.revenue)}</Text>}
-                        </View>
-                        
-                        <View style={styles.DefaultDiv}>
-                            <Text style={styles.RestText}>Cast:</Text>
-                            <Text style={styles.RestText}>{ movieData.persons.map( person => person.name ).join(', ') }</Text>
-                        </View>
-                    </View>
-                </ScrollView>
-            </View>
+                    </ScrollView>
+                </View>
             }
         </ImageBackground>
     );

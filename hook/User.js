@@ -3,17 +3,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const UserContext = createContext({});
 
-export const UserProvider = ({children}) => {
+export const UserProvider = ({ children }) => {
     const [accessToken, accessTokenSetter] = useState(null);
     const [refreshToken, refreshTokenSetter] = useState(null);
 
-    useEffect(() => { 
+    useEffect(() => {
         AsyncStorage.getItem("access_token")
             .then(res => accessTokenSetter(res));
-        
+
         AsyncStorage.getItem("refresh_token")
             .then(res => refreshTokenSetter(res));
-        
+
     }, []);
 
     const setAccessToken = (accessToken) => {
@@ -32,9 +32,9 @@ export const UserProvider = ({children}) => {
     }
 
     return (
-      <UserContext.Provider value={value}>
-          {children}
-      </UserContext.Provider>
+        <UserContext.Provider value={value}>
+            {children}
+        </UserContext.Provider>
     );
 }
 

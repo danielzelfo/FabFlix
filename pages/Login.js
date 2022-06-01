@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button, TextInput, StyleSheet, View, useColorScheme } from 'react-native';
 import { login } from '../backend/idm';
-import {useUser} from "../hook/User";
+import { useUser } from "../hook/User";
 
 const LoginScreen = ({ navigation }) => {
     const [email, onChangeEmail] = useState(null);
@@ -80,11 +80,11 @@ const LoginScreen = ({ navigation }) => {
                     onPress={
                         () => {
                             if (email === null || email === "") {
-                                handleLoginFail({result: {message: "Email is required"}});
+                                handleLoginFail({ result: { message: "Email is required" } });
                                 return;
                             }
                             if (password === null || password === "") {
-                                handleLoginFail({result: {message: "Password is required"}});
+                                handleLoginFail({ result: { message: "Password is required" } });
                                 return;
                             }
                             login(email, password)
@@ -106,8 +106,5 @@ const LoginScreen = ({ navigation }) => {
         </View>
     );
 };
-
-
-
 
 export default LoginScreen;

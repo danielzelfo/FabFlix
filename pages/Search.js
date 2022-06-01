@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from '@react-native-picker/picker';
 import { search_movies } from '../backend/movies';
-import {useUser} from "../hook/User";
+import { useUser } from "../hook/User";
 
 const movieDivider = () => {
     return (
@@ -21,7 +21,7 @@ const SearchScreen = ({ route, navigation }) => {
 
     const theme = useColorScheme();
 
-    const {accessToken, refreshToken, setAccessToken} = useUser();
+    const { accessToken, refreshToken, setAccessToken } = useUser();
 
     const field_names = ["title", "year", "director", "genre", "page", "orderBy", "direction"];
     const default_field_values = ["", "", "", "", "1", "title", "ASC"]
@@ -95,9 +95,9 @@ const SearchScreen = ({ route, navigation }) => {
         // get page number from last successful request data
         let page = pageData.page;
         if (page === undefined)
-            submitPageSearch(2) // undefined means page 1 (default)
+            submitPageSearch(2); // undefined means page 1 (default)
         else
-            submitPageSearch(page + 1)
+            submitPageSearch(page + 1);
     }
     const prevPage = () => {
         let page = pageData.page;
@@ -139,11 +139,11 @@ const SearchScreen = ({ route, navigation }) => {
             marginLeft: (Dimensions.get('window').width - 250) / 2
         },
         SelectStyle1: {
-            width: 7* Dimensions.get('window').width / 16,
+            width: 7 * Dimensions.get('window').width / 16,
             color: theme === 'light' ? "#222831" : "#EEEEEE"
         },
         SelectStyle2: {
-            width: 5* Dimensions.get('window').width / 16,
+            width: 5 * Dimensions.get('window').width / 16,
             color: theme === 'light' ? "#222831" : "#EEEEEE"
         },
         SubmitButton: {
@@ -151,12 +151,12 @@ const SearchScreen = ({ route, navigation }) => {
             height: 50
         },
         SubmitButtonBtn: {
-            flexDirection: 'row', 
-            height: 46, 
+            flexDirection: 'row',
+            height: 46,
             backgroundColor: '#B55400',
             alignItems: 'center',
             justifyContent: 'center',
-            elevation:3,
+            elevation: 3,
             borderRadius: 5,
             margin: 2
         },
@@ -177,7 +177,7 @@ const SearchScreen = ({ route, navigation }) => {
             color: theme === 'light' ? "#222831" : "#EEEEEE"
         },
         MovieSearchDetail: {
-            width: 7*Dimensions.get('window').width/8 - 20,
+            width: 7 * Dimensions.get('window').width / 8 - 20,
         },
         view: {
             margin: 10,
@@ -206,7 +206,7 @@ const SearchScreen = ({ route, navigation }) => {
             fontWeight: "bold"
         },
         thumbnail: {
-            width: Dimensions.get('window').width/8,
+            width: Dimensions.get('window').width / 8,
             margin: 10,
         }
     });
@@ -227,7 +227,7 @@ const SearchScreen = ({ route, navigation }) => {
                     <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={styles.CustomInput} placeholder="genre" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
-                    
+
                 </View>
                 <View style={styles.HorizontalDivCenter}>
                     <Controller name="orderBy" control={control} render={({ field: { value, onChange } }) => (
@@ -259,7 +259,7 @@ const SearchScreen = ({ route, navigation }) => {
                     <View style={styles.movieContainer}>
                         <TouchableHighlight
                             onPress={() => {
-                                navigation.navigate("Movie", {movie_id: item.id})
+                                navigation.navigate("Movie", { movie_id: item.id })
                             }}
                             underlayColor={theme === 'light' ? "#EEEEEE" : "#222831"}>
                             <View style={styles.subContainer} flexDirection='row'>
@@ -287,21 +287,18 @@ const SearchScreen = ({ route, navigation }) => {
                         <Button color="#393E46" title="prev" onPress={prevPage} />
                     </View>
                     <View style={styles.PagingPage}>
-                        <Text style={{color: theme === 'light' ? "#222831" : "#EEEEEE"}}>Page</Text>
+                        <Text style={{ color: theme === 'light' ? "#222831" : "#EEEEEE" }}>Page</Text>
                         <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
-                            <TextInput style={{color: theme === 'light' ? "#222831" : "#EEEEEE"}} placeholder="1" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
+                            <TextInput style={{ color: theme === 'light' ? "#222831" : "#EEEEEE" }} placeholder="1" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                         )} />
                     </View>
                     <View style={styles.PagingButton2} >
-                        <Button color="#393E46" style={{color: "#222831"}} title="next" onPress={nextPage} />
+                        <Button color="#393E46" style={{ color: "#222831" }} title="next" onPress={nextPage} />
                     </View>
                 </View>
             }
         </View>
     );
 };
-
-
-
 
 export default SearchScreen;
