@@ -1,9 +1,8 @@
-import { Dimensions, Text, FlatList, StyleSheet, View, TouchableHighlight, Image, Button, TextInput, TouchableOpacity } from 'react-native';
+import { Dimensions, Text, FlatList, StyleSheet, View, TouchableHighlight, Image, Button, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
 import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Picker } from '@react-native-picker/picker';
 import { search_movies } from '../backend/movies';
-import { HorizontalDivStyle } from '../styles/styles';
 import {useUser} from "../hook/User";
 
 const movieDivider = () => {
@@ -19,6 +18,8 @@ const movieDivider = () => {
 }
 
 const SearchScreen = ({ route, navigation }) => {
+
+    const theme = useColorScheme();
 
     const {accessToken, refreshToken, setAccessToken} = useUser();
 
@@ -105,27 +106,132 @@ const SearchScreen = ({ route, navigation }) => {
         }
     }
 
+    const styles = StyleSheet.create({
+        screenContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: theme === 'light' ? '#EEEEEE' : '#222831'
+        },
+        HorizontalDivCenter: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: theme === 'light' ? '#EEEEEE' : "#222831"
+        },
+        PagingButton1: {
+            justifyContent: "center",
+            alignItems: "center",
+            width: 75
+        },
+        PagingButton2: {
+            justifyContent: "center",
+            alignItems: "center",
+            width: 75,
+            marginLeft: (Dimensions.get('window').width - 250) / 2
+        },
+        PagingPage: {
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            width: 100,
+            marginLeft: (Dimensions.get('window').width - 250) / 2
+        },
+        SelectStyle1: {
+            width: 7* Dimensions.get('window').width / 16,
+            color: theme === 'light' ? "#222831" : "#EEEEEE"
+        },
+        SelectStyle2: {
+            width: 5* Dimensions.get('window').width / 16,
+            color: theme === 'light' ? "#222831" : "#EEEEEE"
+        },
+        SubmitButton: {
+            width: Dimensions.get('window').width / 4,
+            height: 50
+        },
+        SubmitButtonBtn: {
+            flexDirection: 'row', 
+            height: 46, 
+            backgroundColor: '#B55400',
+            alignItems: 'center',
+            justifyContent: 'center',
+            elevation:3,
+            borderRadius: 5,
+            margin: 2
+        },
+        SubmitButtonTxt: {
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: "#EEEEEE"
+        },
+        SelectStyleItem: {
+            fontSize: 14,
+            height: "center",
+            justifyContent: "center"
+        },
+        CustomInput: {
+            alignItems: "center",
+            justifyContent: "center",
+            width: Dimensions.get('window').width / 4,
+            color: theme === 'light' ? "#222831" : "#EEEEEE"
+        },
+        MovieSearchDetail: {
+            width: 7*Dimensions.get('window').width/8 - 20,
+        },
+        view: {
+            margin: 10,
+        },
+        movieContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: theme === 'light' ? '#EEEEEE' : '#393E46'
+        },
+        subContainer: {
+            flex: 1,
+        },
+        buttonContainer: {
+            margin: 20
+        },
+        input: {
+            height: 40,
+            margin: 12,
+            borderWidth: 1,
+            padding: 10,
+        }, baseText: {
+            fontFamily: "Cochin"
+        },
+        titleText: {
+            fontSize: 20,
+            fontWeight: "bold"
+        },
+        thumbnail: {
+            width: Dimensions.get('window').width/8,
+            margin: 10,
+        }
+    });
+
     return (
-        <View style={styles.container}>
+        <View style={styles.screenContainer}>
             <View>
                 <View style={styles.HorizontalDivCenter}>
                     <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="title" onChangeText={onChange} value={(value || "").toString()} />
+                        <TextInput style={styles.CustomInput} placeholder="title" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
                     <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="year" onChangeText={onChange} value={(value || "").toString()} />
+                        <TextInput style={styles.CustomInput} placeholder="year" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
                     <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="director" onChangeText={onChange} value={(value || "").toString()} />
+                        <TextInput style={styles.CustomInput} placeholder="director" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
                     <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={styles.CustomInput} placeholder="genre" onChangeText={onChange} value={(value || "").toString()} />
+                        <TextInput style={styles.CustomInput} placeholder="genre" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                     )} />
                     
                 </View>
                 <View style={styles.HorizontalDivCenter}>
                     <Controller name="orderBy" control={control} render={({ field: { value, onChange } }) => (
-                        <Picker style={styles.SelectStyle1} onValueChange={onChange} selectedValue={(value || "title").toString()}>
+                        <Picker dropdownIconColor={theme === 'light' ? "#222831" : "#EEEEEE"} style={styles.SelectStyle1} onValueChange={onChange} selectedValue={(value || "title").toString()}>
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: title" value="title" />
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: rating" value="rating" />
                             <Picker.Item style={styles.SelectStyleItem} label="Sort by: year" value="year" />
@@ -133,7 +239,7 @@ const SearchScreen = ({ route, navigation }) => {
                     )} />
 
                     <Controller name="direction" control={control} render={({ field: { value, onChange } }) => (
-                        <Picker style={styles.SelectStyle2} onValueChange={onChange} selectedValue={(value || "ASC").toString()}>
+                        <Picker dropdownIconColor={theme === 'light' ? "#222831" : "#EEEEEE"} style={styles.SelectStyle2} onValueChange={onChange} selectedValue={(value || "ASC").toString()}>
                             <Picker.Item style={styles.SelectStyleItem} label="ASC" value="ASC" />
                             <Picker.Item style={styles.SelectStyleItem} label="DESC" value="DESC" />
                         </Picker>
@@ -150,23 +256,22 @@ const SearchScreen = ({ route, navigation }) => {
                 data={results}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
-                    <View style={styles.container}>
+                    <View style={styles.movieContainer}>
                         <TouchableHighlight
                             onPress={() => {
-                                // alert("Key: " + item.id + "\nValue: " + item.title);
                                 navigation.navigate("Movie", {movie_id: item.id})
                             }}
-                            underlayColor="white">
+                            underlayColor={theme === 'light' ? "#EEEEEE" : "#222831"}>
                             <View style={styles.subContainer} flexDirection='row'>
                                 <Image style={styles.thumbnail}
                                     source={{
                                         uri: `https://image.tmdb.org/t/p/w200${item.posterPath}`,
                                     }} />
                                 <View style={styles.MovieSearchDetail}>
-                                    <Text style={{ fontSize: 20, margin: 10 }}>
+                                    <Text style={{ fontSize: 20, margin: 10, color: theme === 'light' ? "#222831" : "#EEEEEE" }}>
                                         {item.title}
                                     </Text>
-                                    <Text style={{ fontSize: 16, margin: 10 }}>
+                                    <Text style={{ fontSize: 16, margin: 10, color: theme === 'light' ? "#222831" : "#EEEEEE" }}>
                                         {item.year} - {item.director}
                                     </Text>
                                 </View>
@@ -179,16 +284,16 @@ const SearchScreen = ({ route, navigation }) => {
             {results.length > 0 &&
                 <View style={styles.HorizontalDivCenter} >
                     <View style={styles.PagingButton1}>
-                        <Button color="#841584" title="prev" onPress={prevPage} />
+                        <Button color="#393E46" title="prev" onPress={prevPage} />
                     </View>
                     <View style={styles.PagingPage}>
-                        <Text>Page</Text>
+                        <Text style={{color: theme === 'light' ? "#222831" : "#EEEEEE"}}>Page</Text>
                         <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
-                            <TextInput placeholder="1" onChangeText={onChange} value={(value || "").toString()} />
+                            <TextInput style={{color: theme === 'light' ? "#222831" : "#EEEEEE"}} placeholder="1" placeholderTextColor="grey" onChangeText={onChange} value={(value || "").toString()} />
                         )} />
                     </View>
                     <View style={styles.PagingButton2} >
-                        <Button color="#841584" title="next" onPress={nextPage} />
+                        <Button color="#393E46" style={{color: "#222831"}} title="next" onPress={nextPage} />
                     </View>
                 </View>
             }
@@ -196,102 +301,7 @@ const SearchScreen = ({ route, navigation }) => {
     );
 };
 
-const styles = StyleSheet.create({
-    HorizontalDivCenter: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    PagingButton1: {
-        justifyContent: "center",
-        alignItems: "center",
-        width: 75
-    },
-    PagingButton2: {
-        justifyContent: "center",
-        alignItems: "center",
-        width: 75,
-        marginLeft: (Dimensions.get('window').width - 250) / 2
-    },
-    PagingPage: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-        width: 100,
-        marginLeft: (Dimensions.get('window').width - 250) / 2
-    },
-    SelectStyle1: {
-        backgroundColor: "white",
-        width: 7* Dimensions.get('window').width / 16
-    },
-    SelectStyle2: {
-        backgroundColor: "white",
-        width: 5* Dimensions.get('window').width / 16
-    },
-    SubmitButton: {
-        width: Dimensions.get('window').width / 4,
-        height: 50
-    },
-    SubmitButtonBtn: {
-        flexDirection: 'row', 
-        height: 46, 
-        backgroundColor: '#ff5c5c',
-        alignItems: 'center',
-        justifyContent: 'center',
-        elevation:3,
-        borderRadius: 5,
-        margin: 2
-    },
-    SubmitButtonTxt: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: "white"
-    },
-    SelectStyleItem: {
-        fontSize: 14,
-        height: "center",
-        justifyContent: "center"
-    },
-    CustomInput: {
-        alignItems: "center",
-        justifyContent: "center",
-        width: Dimensions.get('window').width / 4
-    },
-    MovieSearchDetail: {
-        width: 7*Dimensions.get('window').width/8 - 20,
-    },
-    view: {
-        margin: 10,
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    subContainer: {
-        flex: 1,
-    },
-    buttonContainer: {
-        margin: 20
-    },
-    input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    }, baseText: {
-        fontFamily: "Cochin"
-    },
-    titleText: {
-        fontSize: 20,
-        fontWeight: "bold"
-    },
-    thumbnail: {
-        width: Dimensions.get('window').width/8,
-        margin: 10,
-    }
-});
+
 
 
 export default SearchScreen;

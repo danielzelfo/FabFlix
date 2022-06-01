@@ -1,11 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import { Button, TextInput, StyleSheet, View } from 'react-native';
+import { Button, TextInput, StyleSheet, View, useColorScheme } from 'react-native';
 import { login } from '../backend/idm';
 import {useUser} from "../hook/User";
 
 const LoginScreen = ({ navigation }) => {
     const [email, onChangeEmail] = useState(null);
     const [password, onChangePassword] = useState(null);
+
+    const theme = useColorScheme();
 
     const {
         accessToken, setAccessToken, setRefreshToken
@@ -32,6 +34,29 @@ const LoginScreen = ({ navigation }) => {
         }
     }
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: theme === 'light' ? '#EEEEEE' : '#222831'
+        },
+        buttonContainer: {
+            margin: 20
+        },
+        alternativeLayoutButtonContainer: {
+            margin: 20,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+        }, input: {
+            height: 40,
+            margin: 12,
+            borderWidth: 1,
+            padding: 10,
+            backgroundColor: '#EEEEEE',
+            color: "#222831"
+        },
+    });
+
     return (
 
         <View style={styles.container}>
@@ -39,6 +64,7 @@ const LoginScreen = ({ navigation }) => {
                 style={styles.input}
                 onChangeText={onChangeEmail}
                 placeholder="Email"
+                placeholderTextColor="grey"
                 value={email}
             />
             <TextInput
@@ -46,6 +72,7 @@ const LoginScreen = ({ navigation }) => {
                 onChangeText={onChangePassword}
                 value={password}
                 placeholder="Password"
+                placeholderTextColor="grey"
                 secureTextEntry={true}
             />
             <View style={styles.buttonContainer}>
@@ -66,38 +93,21 @@ const LoginScreen = ({ navigation }) => {
                         }
                     }
                     title="LOGIN"
+                    color="#B55400"
                 />
             </View>
             <View style={styles.buttonContainer}>
                 <Button
                     onPress={() => navigation.navigate("Register")}
                     title="SIGN UP"
-                    color="#841584"
+                    color="#393E46"
                 />
             </View>
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-    },
-    buttonContainer: {
-        margin: 20
-    },
-    alternativeLayoutButtonContainer: {
-        margin: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-    }, input: {
-        height: 40,
-        margin: 12,
-        borderWidth: 1,
-        padding: 10,
-    },
-});
+
 
 
 export default LoginScreen;
