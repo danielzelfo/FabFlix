@@ -8,8 +8,8 @@ export async function login(email, password) {
 
     const options = {
         method: "POST",
-        baseURL: "http://akera.ddns.net:8082",
-        url: "/login",
+        baseURL: "http://akera.ddns.net:8085",
+        url: "idm/login",
         data: requestBody
     }
 
@@ -24,8 +24,8 @@ export async function registerRequest(email, password) {
 
     const options = {
         method: "POST",
-        baseURL: "http://akera.ddns.net:8082",
-        url: "/register",
+        baseURL: "http://akera.ddns.net:8085",
+        url: "idm/register",
         data: requestBody
     }
 
