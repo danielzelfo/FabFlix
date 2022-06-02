@@ -52,6 +52,8 @@ const SearchScreen = ({ route, navigation }) => {
             for (let i = 0; i < field_names.length; ++i) {
                 setValue(field_names[i], request[field_names[i]] === undefined ? default_field_values[i] : "" + request[field_names[i]]);
             }
+        } else {
+            alert("Reached end of movies.")
         }
     }
 

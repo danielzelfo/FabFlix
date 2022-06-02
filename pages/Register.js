@@ -80,7 +80,7 @@ const RegisterScreen = ({ route, navigation }) => {
                 }
 
                 registerRequest(email, password)
-                  .then(response => navigation.navigate("Login"))
+                  .then(response => {alert("Registered successfully."); navigation.navigate("Login")})
                   .catch(error => { console.log(error); handleRegisterError(error.response.data) })
 
               }
