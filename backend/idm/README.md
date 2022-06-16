@@ -1,4 +1,4 @@
-# CS122B Backend 1 - The IDM Service
+# FabFlix Backend - The IDM Service
 
 #### [Application Settings](#application-settings)
 
@@ -15,37 +15,7 @@
 
 ## Application Settings
 
-Spring Boot can has a large number of settings that can be set with a file called `application.yml`. \
-This file is already provided for you and is placed here for reference.
-
-##### `application.yml`
-
-```yml
-spring:
-  application:
-    name: IdmService
-  datasource:
-    url: jdbc:mysql://localhost:3306
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-
-server:
-  address: 0.0.0.0
-  port: 8081
-  error: # These settings are for debugging
-    include-exception: true
-    include-message: always
-
-logging:
-  file:
-    name: ./IdmService.log
-
-idm:
-  key-file-name: ec-key.json
-  access-token-expire: 30m
-  refresh-token-expire: 12h
-  max-refresh-token-life-time: 30d
-```
+Spring Boot can has a large number of settings that can be set with a file called `application.yml`.
 
 ## Database
 
@@ -309,37 +279,9 @@ idm:
 
 ### Initial Data
 
-All the data to initialize your database is found in the `db` folder here: [db folder](/db)
+All the data to initialize your database is found in the `db` folder here: [db folder](db)
 
 # Endpoints
-
-### Order of Validation
-All <code>❗ 400: Bad Request</code> Results must be checked first, and returned before any other action is made. \
-The order of the checks within <code>❗ 400: Bad Request</code> is not tested as each Result is tested individually.
-
-### JsonInclude
-In the case of non-successful results, where values are expected, the values should not be included, for example.
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   },
-   "value": null 
-}
-```
-the <code>value</code> key should not be included: 
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   }
-}
-```
-This is done by insuring that all <code>null</code> values are dropped by either:
-- Having your Model extend <code>ResponseModel<Model></code>, or
-- Putting the <code>@JsonInclude(JsonInclude.Include.NON_NULL)</code> on your Model class
   
 ### Result
 All <code>Result</code> objects are avaible as static constants inside of the <code>com.github.klefstad_teaching.cs122b.core.result.IDMResults</code> class.

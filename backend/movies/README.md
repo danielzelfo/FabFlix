@@ -1,4 +1,4 @@
-# CS122B Backend 2 - The Movies Service
+# FabFlix Backend - The Movies Service
 
 #### [Application](#application)
  - [pom.xml](#pomxml)
@@ -10,15 +10,6 @@
  - [Schemas](#schemas)
  - [Tables](#tables)
  - [Initial Data](#initial-data)
-
-#### [Notes](#notes)
- - [Order of Validation](#order-of-validation)
- - [JsonInclude](#jsoninclude)
- - [Result](#result)
- - [SignedJWT](#signedjwt)
- - [Person VS Director](#person-vs-director)
- - [Substring Search](#substring-search)
- - [Pagination](#pagination)
 
 #### [Endpoints](#endpoints)
 
@@ -42,21 +33,21 @@ Maven gets all its settings from a file called `pom.xml`. This file determines t
 
 Spring Boot has a large number of settings that can be set with a file called `application.yml`. We have already created this file for you and have filled it with some settings. There is a file for the main application as well as one for the tests. 
 
- - [Main application.yml](/src/main/resources/application.yml)
- - [Test application.yml](/src/test/resources/application.yml)
+ - [Main application.yml](src/main/resources/application.yml)
+ - [Test application.yml](src/test/resources/application.yml)
 
 ### Resources
 
 There are two folders in this project that contain resources, and application settings, as well as files required for the tests.
 
- - [Main Resources](/src/main/resources)
- - [Test Resources](/src/test/resources)
+ - [Main Resources](src/main/resources)
+ - [Test Resources](src/test/resources)
 
 ### Tests
 
 There is a Single class that contain all of our test cases: 
 
- - [MoviesServiceTest](/src/test/java/com/github/klefstad_teaching/cs122b/movies/MoviesServiceTest.java)
+ - [MoviesServiceTest](src/test/java/com/github/klefstad_teaching/cs122b/movies/MoviesServiceTest.java)
 
 ## Database
 
@@ -323,74 +314,7 @@ There is a Single class that contain all of our test cases:
 
 ### Initial Data
 
-All the data to initialize your database is found in the `db` folder here: [db folder](/db). They are numbered in the order they should be executed.
-
-# Notes
-
-### Order of Validation
-All `❗ 400: Bad Request` Results must be checked first, and returned before any other action is made. \
-The order of the checks within `❗ 400: Bad Request` is not tested as each Result is tested individually.
-
-### JsonInclude
-In the case of non-successful results, where values are expected, the values should not be included, for example.
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   },
-   "value": null 
-}
-```
-the `value` key should not be included: 
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   }
-}
-```
-This is done by insuring that all `null` values are dropped by either:
-- Having your Model extend `ResponseModel<Model>`, or
-- Putting the `@JsonInclude(JsonInclude.Include.NON_NULL)` on your Model class
-  
-### Result
-All `Result` objects are available as static constants inside of the `com.github.klefstad_teaching.cs122b.core.result.MoviesResults` class.
-These can be used rather than creating your own.
-
-### SignedJWT
-All endpoints in this service are considered 'privilged' as in, the user calling the endpoint must be authorized and as such must included their serialized `SignedJWT` inlcuded in the header of the request under the `Authorization` header. In the test cases you'll see that we are including these headers with JWT's for your convenience when testing.
-
-In Spring there is a way to automatically take this header and turn it into a `SignedJWT` (This is already done for you by a provided filter here: [JWTAuthenticationFilter](https://github.com/klefstad-teaching/CS122B-Core/blob/main/src/main/java/com/github/klefstad_teaching/cs122b/core/security/JWTAuthenticationFilter.java)). There is also a way to "ask" spring for this `SignedJWT` by using the `@AuthenticationPrincipal SignedJWT user` function parameter in the endpoint like so:
-
-```java
-@GetMapping("/path")
-public ResponseEntity<ResponseModel> endpoint(@AuthenticationPrincipal SignedJWT user)
-{
-    ...
-}
-```
-
-We can then get information out of the `SignedJWT` by using `user.getJWTClaimsSet()` and then getting the corrosponging claim by using `getClaim()`. Note that we get the claim by the key we used when we set the claim in the idm.
-
-We set our userId using `.claim(JWTManager.CLAIM_ID, userId)` we can get that id by using `getCustomClaim(JWTManager.CLAIM_ID)`. However this returns a type of `Object` if we know what the type of the specific claim is we can use the helper functions. We know we set `JWTManager.CLAIM_ID` as a `Long` so we can use `getLongClaim(JWTManager.CLAIM_ID)` to get it as a type of `Long`.
-
-A convient function to use to get our roles our of our `SignedJWT` is  `.getStringListClaim(JWTManager.CLAIM_ROLES)` which returns our user's roles as a list of `String`s
-
-### Person and Director
-- Our database schema has a `movie_person` table that has the list of `person` in a `movie`. Not every movie is guaranteed to have a `person` in it. (There could be no `movie_person` assoications for a certain movie).
-- However every movie is guaranteed to have a director To get the director of a movie you must join the `movie` and `person` table like this:
-```sql
-SELECT m.title, ... , p.name
-FROM movies m
-    JOIN person p ON p.id = m.director_id
-```
-- For the endpoint [GET: Movie Search By Person Id](#movie-search-by-person-id) do not account for director values, search only for `persons` in `movie_person`. This should prevent the SQL Queries from becoming too complex.
- 
-### Substring Search
- 
-For queries marked as (Search by [substring](#substring-search)) make sure to have the value surrounded by '%' **on both sides** (`%value%`)to allow for search by sub-string. Refer to this section in the activity: [Wildcard String Matching](https://github.com/klefstad-teaching/CS122B-A4-SQL/blob/main/README.md#wildcard-string-matching)
+All the data to initialize your database is found in the `db` folder here: [db folder](db). They are numbered in the order they should be executed.
  
 # Endpoints
 

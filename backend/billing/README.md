@@ -1,4 +1,4 @@
-# CS122B Backend 3 - The Billing Service
+# FabFlix Backend - The Billing Service
 
 #### [Stripe](#stripe)
 
@@ -12,14 +12,6 @@
  - [Schemas](#schemas)
  - [Tables](#tables)
  - [Initial Data](#initial-data)
- 
-#### [Notes](#notes)
- - [Order of Validation](#order-of-validation)
- - [JsonInclude](#jsoninclude)
- - [Result](#result)
- - [SignedJWT](#signedjwt)
- - [BigDecimal](#bigdecimal)
- - [Applying Discount For Premium Users](#applying-discount-for-premium-users)
 
 #### [Endpoints](#endpoints)
 1. [POST: Cart Insert](#cart-insert)
@@ -34,15 +26,10 @@
 
 ## Stripe
 
-Before we can start on this backend we will need a developer account from Stripe, and get our api keys:
+A developer account from Stripe is required to get stripe api keys.
 
-1. Go to [Stripe Developer Docs](https://stripe.com/docs/development) and create an account.
-2. Click on the `Dashboard ->` button in the top right hand corner to access our Dashboard.
-3. Click on the `Developers` button in the top right hand corner to access out developer info.
-4. Click on the `API keys` tab on the left menu.
-5. Copy the `Secret key` (you will need to press `Revel test key` to see it) and paste it as your `STRIPE_API_KEY` enviroment variable in your configuration settings. (Just like how we did with our database credentials)
+Set the `STRIPE_API_KEY` environment variable to `Secret key` from developer info in the Stripe Developer Dashboard.
 
-We will need the public key later for our front end so refrence this guide when you want to return to that webpage. We just want to use the test data and test keys. You may close your account after the course if you would like.
 
 ## Application
 
@@ -58,21 +45,21 @@ Maven gets all its settings from a file called `pom.xml`. This file determines t
 
 Spring Boot has a large number of settings that can be set with a file called `application.yml`. We have already created this file for you and have filled it with some settings. There is a file for the main application as well as one for the tests. 
 
- - [Main application.yml](/src/main/resources/application.yml)
- - [Test application.yml](/src/test/resources/application.yml)
+ - [Main application.yml](src/main/resources/application.yml)
+ - [Test application.yml](src/test/resources/application.yml)
 
 ### Resources
 
 There are two folders in this project that contain resources, and application settings, as well as files required for the tests.
 
- - [Main Resources](/src/main/resources)
- - [Test Resources](/src/test/resources)
+ - [Main Resources](src/main/resources)
+ - [Test Resources](src/test/resources)
 
 ### Tests
 
 There is a Single class that contain all of our test cases: 
 
- - [BillingServiceTest](/src/test/java/com/github/klefstad_teaching/cs122b/billing/BillingServiceTest.java)
+ - [BillingServiceTest](src/test/java/com/github/klefstad_teaching/cs122b/billing/BillingServiceTest.java)
 
 ## Database
 
@@ -266,37 +253,7 @@ There is a Single class that contain all of our test cases:
 
 ### Initial Data
 
-All the data to initialize your database is found in the `db` folder here: [db folder](/db).
-
-# Notes
-
-### Order of Validation
-All `❗ 400: Bad Request` Results must be checked first, and returned before any other action is made. \
-The order of the checks within `❗ 400: Bad Request` is not tested as each Result is tested individually.
-
-### JsonInclude
-In the case of non-successful results, where values are expected, the values should not be included, for example.
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   },
-   "value": null 
-}
-```
-the `value` key should not be included: 
-```json
-{
-   "result": {
-      "code": 32,
-      "message": "Data contains invalid integers"
-   }
-}
-```
-This is done by insuring that all `null` values are dropped by either:
-- Having your Model extend `ResponseModel<Model>`, or
-- Putting the `@JsonInclude(JsonInclude.Include.NON_NULL)` on your Model class
+All the data to initialize your database is found in the `db` folder here: [db folder](db).
   
 ### Result
 All `Result` objects are available as static constants inside of the `com.github.klefstad_teaching.cs122b.core.result.BillingResults` class.
@@ -304,39 +261,6 @@ These can be used rather than creating your own.
 
 ### SignedJWT
 All endpoints in this service are considered 'privilged' as in, the user calling the endpoint must be authorized and as such must included their serialized `SignedJWT` inlcuded in the header of the request under the `Authorization` header. In the test cases you'll see that we are including these headers with JWT's for your convenience when testing.
-
-In Spring there is a way to automatically take this header and turn it into a `SignedJWT` (This is already done for you by a provided filter here: [JWTAuthenticationFilter](https://github.com/klefstad-teaching/CS122B-Core/blob/main/src/main/java/com/github/klefstad_teaching/cs122b/core/security/JWTAuthenticationFilter.java)). There is also a way to "ask" spring for this `SignedJWT` by using the `@AuthenticationPrincipal SignedJWT user` function parameter in the endpoint like so:
-
-```java
-@GetMapping("/path")
-public ResponseEntity<ResponseModel> endpoint(@AuthenticationPrincipal SignedJWT user)
-{
-    ...
-}
-```
-
-We can then get information out of the `SignedJWT` by using `user.getJWTClaimsSet()` and then getting the corrosponging claim by using `getClaim()`. Note that we get the claim by the key we used when we set the claim in the idm.
-
-We set our userId using `.claim(JWTManager.CLAIM_ID, userId)` we can get that id by using `getCustomClaim(JWTManager.CLAIM_ID)`. However this returns a type of `Object` if we know what the type of the specific claim is we can use the helper functions. We know we set `JWTManager.CLAIM_ID` as a `Long` so we can use `getLongClaim(JWTManager.CLAIM_ID)` to get it as a type of `Long`.
-
-A convient function to use to get our roles our of our `SignedJWT` is  `.getStringListClaim(JWTManager.CLAIM_ROLES)` which returns our user's roles as a list of `String`s
-
-### BigDecimal
-
-**Very Important** For all values that deal with money, Including those in our `ResponseModel` We want to make sure we are returning a type of `BigDecimal` with a scale set to `2`. The tests will fail if we do not have it set to this scale as json considers: `14.5500` different than `14.55`.
-
-Refer to Activity 5 for how to deal with [BigDecimal](https://github.com/klefstad-teaching/CS122B-A5-Stripe#bigdecimal) on how to deal with `BigDecimal`'s especially the last part with dealing with scale and rounding.
-
-### Applying Discount For Premium Users
-
-User's that have the `Premium` role have a diffrent `UnitPrice` that must be calculated by using the `discount` column in the table. Calculating the `DiscountedUnitPrice` requires we follow a very specific algorithm that is described below:
-
-#### Formula for applying the discount
-1. `DiscountedUnitPrice` = ( `UnitPrice` * (1 - (`Discount` / 100.0))) 
-   - Notice we use 100.0 (A double with the .0 at the end) this is **VERY** important, We want discount to become a double! We will get the wrong answer if we do not do this.
-3. `DiscountedUnitPrice` scale set to `2` with `RounderingMode.DOWN`
-4. `Total` for each movie = `NewUnitPrice` * `Quantity`
-5. `Total` for order is the sum of all the `total`s;
 
 # Endpoints
 
@@ -685,7 +609,7 @@ result: Result
 </table>
 
 ## Cart Retrieve
-Retrieve's all items from the user's cart with some movie details. If the user has the `Premium` Role then we should report back with the "discounted rate". (Refer to [Formula for applying the discount](#formula-for-applying-the-discount) on how to do this for `Premium` users)
+Retrieve's all items from the user's cart with some movie details. If the user has the `Premium` Role then we should report back with the "discounted rate".
 
 ### Path
 ```http 
@@ -871,8 +795,6 @@ The PaymentIntent should be created with these three properties
 1. **Amount:** The total amount of the carts contents. (Refer to [Formula for applying the discount](#formula-for-applying-the-discount) on how to do this for `Premium` users)
 2. **Description:** The description of the movie's titles in list format (\<title>, \<title>, ... , \<title>). 
 3. **Metadata:** The key-value pair of "userId": \<userId stored in the users JWT>
-
-Refer to Activity 5 for how to deal with [BigDecimal](https://github.com/klefstad-teaching/CS122B-A5-Stripe#bigdecimal) on how to deal with `BigDecimal`'s especially the last part with dealing with scale and rounding.
 
 
 ### Path
