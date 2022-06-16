@@ -8,7 +8,8 @@ import { order_list, order_detail } from "backend/billing"
 export const OrderHistory = () => {
     useEffect(() =>
         submitSearch()
-        , []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    , []);
 
     const {
         accessToken, setAccessToken

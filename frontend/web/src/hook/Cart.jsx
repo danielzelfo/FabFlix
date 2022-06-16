@@ -145,6 +145,8 @@ export const CartProvider = ({children}) => {
     useEffect(() => {
         if (accessToken !== null)
             downloadCart()
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     } , [accessToken]);
 
     const value = {

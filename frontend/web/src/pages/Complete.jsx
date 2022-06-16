@@ -30,7 +30,9 @@ export const Complete = () => {
             return;
         }
         order_complete(accessToken, paymentIntent)
-            .then((response) => completeOrder(response))
+            .then((response) => completeOrder(response));
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

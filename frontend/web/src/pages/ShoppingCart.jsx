@@ -16,6 +16,7 @@ const ShoppingCart = () => {
         } else {
             setIgnoreCartUpdate(false);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [cartData]);
 
     const { updateCart } = useCart();

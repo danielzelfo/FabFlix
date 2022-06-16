@@ -37,6 +37,8 @@ const Movie = () => {
     useEffect(() => 
         get_movie(movie_id, accessToken)
             .then(response => {movieDataSetter(response.data); setBackgroundImage(`url(https://image.tmdb.org/t/p/original${response.data.movie.backdropPath})`)})
+    
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     , []);
 
     const currencyFormat = (num) => {

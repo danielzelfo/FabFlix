@@ -45,6 +45,8 @@ export function Checkout() {
   useEffect(() => {
     order_payment(accessToken)
       .then((response) => handleOrderPaymentResponse(response))
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const appearance = {
