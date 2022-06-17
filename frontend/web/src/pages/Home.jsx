@@ -67,6 +67,9 @@ const Home = () => {
     }
 
     const submitPageSearch = (targetPage) => {
+        // if page did not change
+        if (pageData.page === targetPage)
+            return;
         // use current page request data / change page to target page
         const payLoad = {};
         Object.assign(payLoad, pageData);
@@ -95,11 +98,46 @@ const Home = () => {
         }
     }
 
+    const [arrowAdvanced, setArrowAdvanced] = useState("↓");
+
+    const showAdvancedSearch = () => {
+        if (arrowAdvanced === "↓") {
+            setArrowAdvanced("↑");
+        } else {
+            setArrowAdvanced("↓");
+        }
+    }
+
+    const searchPage = () => {
+        let page = getValues("page");
+        if (page !== undefined) {
+            let ipage = parseInt(page)
+            if ( !isNaN(ipage) && page > 0)
+                submitPageSearch(ipage);
+        }
+    }
+
     return (
         <View style={AppStyles.MainDiv}>
             <View style={AppStyles.VerticalDiv}>
                 <Text style={AppStyles.H1Text}>FabFlix</Text>
-                <View style={AppStyles.HorizontalDivRight}>
+                <View style={AppStyles.HorizontalDivCenter}>
+                    <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="title" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Button title="Search" onPress={handleSubmit(submitSearch)} />
+                </View>
+
+                <View style={arrowAdvanced === "↓" ? {display: "none"} : AppStyles.HorizontalDivCenter}>
+                    <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="year" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="director" onChangeText={onChange} value={value || ""} />
+                    )} />
+                    <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
+                        <TextInput style={AppStyles.CustomInput} placeholder="genre" onChangeText={onChange} value={value || ""} />
+                    )} />
                     <Controller name="limit" control={control} render={({ field: { value, onChange } }) => (
                         <Picker style={AppStyles.SelectStyle} onValueChange={onChange} value={value || "10"}>
                             <Picker.Item label="Limit: 10" value="10" />
@@ -124,27 +162,9 @@ const Home = () => {
                         </Picker>
                     )} />
                 </View>
-                <View style={AppStyles.HorizontalDivCenter}>
-                    <Controller name="title" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInput} placeholder="title" onChangeText={onChange} value={value || ""} />
-                    )} />
-                    <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInput} placeholder="year" onChangeText={onChange} value={value || ""} />
-                    )} />
-                    <Controller name="director" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInput} placeholder="director" onChangeText={onChange} value={value || ""} />
-                    )} />
-                    <Controller name="genre" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInput} placeholder="genre" onChangeText={onChange} value={value || ""} />
-                    )} />
-                    <Button title="Search" onPress={handleSubmit(submitSearch)} />
-                </View>
-                <View style={AppStyles.HorizontalDivRight}>
-                    <Text>Page</Text>
-                    <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
-                        <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""} />
-                    )} />
-                </View>
+
+                <Text onClick={showAdvancedSearch} style={{cursor: "pointer"}}>{arrowAdvanced === "↓" ? "↓ advanced search ↓" : "↑ basic search ↑"}</Text>
+
             </View>
 
             {
@@ -160,8 +180,15 @@ const Home = () => {
                             }
                         </View>
                         <View style={AppStyles.HorizontalDivCenterDown}>
-                            <Button title="prev" onPress={prevPage} />
-                            <Button title="next" onPress={nextPage} />
+                            <View style={{justifyContent: "end"}}><Button title="prev" onPress={prevPage} /></View>
+                            <View style={AppStyles.VerticalDiv}>
+                                <Text>Page</Text>
+                                <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
+                                    <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""} />
+                                )} />
+                                <Button title="go" onPress={searchPage}/>
+                            </View>
+                            <View style={{justifyContent: "end"}}><Button title="next" onPress={nextPage} /></View>
                         </View>
                     </View>
                     :

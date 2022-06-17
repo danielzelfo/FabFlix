@@ -57,7 +57,8 @@ export const AppStyles = StyleSheet.create({
     },
     HorizontalDivCenter: {
         ...HorizontalDivStyle,
-        justifyContent: "center"
+        justifyContent: "center",
+        flexWrap: "wrap"
     },
     HorizontalDivCenterDown: {
         ...HorizontalDivStyle,
@@ -113,7 +114,7 @@ export const AppStyles = StyleSheet.create({
         borderRadius: "7.5px",
         padding: "2.5px",
         paddingLeft: "10px",
-        paddingRight: "10px"
+        paddingRight: "10px",
     },
     ResultBody: {
         display: "table-row-group"
@@ -123,7 +124,8 @@ export const AppStyles = StyleSheet.create({
     },
     CustomInputNum: {
         ...CustomInputStyle,
-        width: "4em"
+        width: "4em",
+        textAlign: "center"
     },
     ErrorMsg: {
         color: "red",
