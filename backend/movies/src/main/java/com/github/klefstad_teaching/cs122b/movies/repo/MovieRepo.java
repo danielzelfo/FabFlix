@@ -215,17 +215,23 @@ public class MovieRepo
                 "( " +
                 "SELECT DISTINCT g.id, g.name " +
                 "FROM movies.movie_genre mg " +
-                "JOIN movies.genre g on g.id = mg.genre_id " +
-                "WHERE mg.movie_id = :movieId ";
+                "JOIN movies.genre g on g.id = mg.genre_id ";
 
+        // if the user cannot see hidden movies -- m.hidden must be 0
         if(!validate.canSeeHiddenMovies(roles)) {
-            sql += "AND m.hidden = 0 ";
+            sql += "JOIN movies.movie m on m.id = mg.movie_id " +
+                    "WHERE m.id = :movieId " +
+                    "AND m.hidden = 0 ";
+        } else {
+            sql += "WHERE mg.movie_id = :movieId ";
         }
+
         sql += "ORDER BY g.name ASC ) t;";
         source.addValue("movieId", movieId, Types.INTEGER);
 
         String jsonArrayString = "";
         try {
+            System.out.println(sql);
             jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
         } catch (EmptyResultDataAccessException exc ) {
             //this shouldn't happen
@@ -250,11 +256,17 @@ public class MovieRepo
                 "(" +
                 "SELECT DISTINCT p.id, p.name, p.popularity " +
                 "FROM movies.movie_person mp " +
-                "JOIN movies.person p ON p.id = mp.person_id " +
-                "WHERE mp.movie_id = :movieId ";
+                "JOIN movies.person p ON p.id = mp.person_id ";
+
+        // if the user cannot see hidden movies -- m.hidden must be 0
         if(!validate.canSeeHiddenMovies(roles)) {
-            sql += "AND m.hidden = 0 ";
+            sql += "JOIN movies.movie m ON m.id = mp.movie_id " +
+                    "WHERE m.id = :movieId " +
+                    "AND m.hidden = 0 ";
+        } else {
+            sql += "WHERE mp.movie_id = :movieId ";
         }
+
         sql += "ORDER BY p.popularity DESC, p.id ASC ) t;";
         source.addValue("movieId", movieId, Types.INTEGER);
 
