@@ -49,7 +49,7 @@ const Login = () => {
 
         login(payLoad)
             .then(response => handleLoginSucess(response))
-            .catch(error => handleLoginFail(error.response.data))
+            .catch(error => error.response === undefined ? setErrorMessage(["Internal server error. Please try again later", false]) :  handleLoginFail(error.response.data))
     }
 
     return (

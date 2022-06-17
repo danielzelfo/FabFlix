@@ -25,6 +25,11 @@ const LoginScreen = ({ navigation }) => {
     }
 
     const handleLoginFail = (error) => {
+        if (error.result === undefined) {
+            alert("Internal server error. Please try again later.");
+            return;
+        } 
+
         let errormsg = error.result.message;
         let errorcode = error.result.code;
         if (errorcode === 1021) {

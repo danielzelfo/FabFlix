@@ -11,6 +11,11 @@ const RegisterScreen = ({ route, navigation }) => {
   const [passwordRe, onChangePasswordRe] = useState(null);
 
   const handleRegisterError = (error) => {
+    if (error.result === undefined) {
+      alert("Internal server error. Please try again later.");
+      return;
+    }
+
     if (error.result.code === 1011)
       alert(error.result.message + ". Please login.")
     else

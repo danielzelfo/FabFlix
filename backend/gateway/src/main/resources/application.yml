@@ -10,7 +10,7 @@ spring:
 
 server:
   address: 0.0.0.0
-  port: 8084
+  port: 8085
   error:
     include-exception: true
     include-message: always
@@ -20,8 +20,8 @@ logging:
     name: ./GatewayService.log
 
 gateway:
-  idm: http://localhost:8081
-  movies: http://localhost:8082
-  billing: http://localhost:8083
+  idm: http://localhost:8082
+  movies: http://localhost:8083
+  billing: http://localhost:8084
   authenticate-path: /authenticate
   max-logs: 10

@@ -28,7 +28,7 @@ const Register = () => {
 
         register_backend(payLoad)
             .then(response => navigate("/login"))
-            .catch(error => setErrorMessage(error.response.data.result.code === 1011 ? [error.response.data.result.message + ". Please login ", true] : [error.response.data.result.message, false]))
+            .catch(error => error.response === undefined ? setErrorMessage(["Internal server error. Please try again later", false]) : setErrorMessage(error.response.data.result.code === 1011 ? [error.response.data.result.message + ". Please login ", true] : [error.response.data.result.message, false]))
     }
 
     return (
