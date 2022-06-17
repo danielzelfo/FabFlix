@@ -21,7 +21,7 @@ const Movie = () => {
 
     const {control, getValues, handleSubmit} = useForm();
 
-    const [backgroundImg, setBackgroundImage] = useState("url(https://static.pexels.com/photos/1227/night-dark-blur-blurred.jpg)")
+    const [backgroundImg, setBackgroundImage] = useState("url(https://i.imgur.com/sx7uw26.jpg)")
     var MovieMainDiv = {
         width: "100%",
         position: "fixed",
@@ -74,7 +74,7 @@ const Movie = () => {
                 <Text>{movieData.movie.year}</Text>
                 <Text>{movieData.movie.director}</Text>
 
-                <Image source={{uri: `https://image.tmdb.org/t/p/original${movieData.movie.posterPath}`}} style={AppStyles.Backdrop} />
+                <Image source={{uri: `https://image.tmdb.org/t/p/original${movieData.movie.posterPath}`}} style={AppStyles.MoviePoster} />
                 
                 <Text>{movieData.movie.rating}/10 ({movieData.movie.numVotes})</Text>
                 <View style={AppStyles.HorizontalDivCenter}>

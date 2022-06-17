@@ -77,12 +77,6 @@ export const AppStyles = StyleSheet.create({
     ResultRow: {
         display: "table-row"
     },
-    ResultCell0: {
-        ...ResultCellStyle,
-        width: "30%",
-        padding: "5px",
-        textAlign: "center"
-    },
     ResultCell1: {
         ...ResultCellStyle,
         width: "60%",
@@ -98,13 +92,6 @@ export const AppStyles = StyleSheet.create({
         whiteSpace: "nowrap",
         overflow: "hidden",
         textOverflow: "ellipsis"
-    },
-    ResultCellTextCentered: {
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        display: "flex",
-        justifyContent: "center"
     },
     H1Text: {
         display: "block",
@@ -194,7 +181,7 @@ export const AppStyles = StyleSheet.create({
         width: "80px",
         marginLeft: "-80px"
     },
-    Backdrop: {
+    MoviePoster: {
         width: "100%",
         height: "350px",
         resizeMode: "contain"
@@ -230,5 +217,18 @@ export const AppStyles = StyleSheet.create({
         ...HorizontalDivStyle,
         justifyContent: "right",
         width: "120px"
-    }
+    },
+    ResultsContainer: {
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "center"
+    },
+    Poster: {
+        width: "225px",
+        height: "400px",
+        resizeMode: "contain",
+        margin: "10px"
+    },
 });

@@ -150,27 +150,14 @@ const Home = () => {
             {
                 results.length > 0 ?
                     <View style={AppStyles.ResultContainerDiv}>
-                        <View style={AppStyles.ResultTable}>
-                            <View style={AppStyles.ResultBody}>
-                                <View style={AppStyles.ResultRow}>
-                                    <View style={AppStyles.ResultCell0}><Text style={AppStyles.BoldCenteredText}>Title</Text></View>
-                                    <View style={AppStyles.ResultCell0}><Text style={AppStyles.BoldCenteredText}>Photo</Text></View>
-                                    <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Year</Text></View>
-                                    <View style={AppStyles.ResultCell23}><Text style={AppStyles.BoldCenteredText}>Director</Text></View>
-                                </View>
-                                {
-                                    results.map(result =>
-                                        <View style={AppStyles.ResultRow} key={result.id}>
-                                            <View style={AppStyles.ResultCell0}><Link to={`/movie/${result.id}`}><Text style={AppStyles.ResultCellText}>{result.title}</Text></Link></View>
-                                            <View style={AppStyles.ResultCell0}>
-                                                <Link to={`/movie/${result.id}`}><Image source={{ uri: `https://image.tmdb.org/t/p/original${result.posterPath}` }} style={AppStyles.Backdrop} /></Link>
-                                            </View>
-                                            <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.year}</Text></View>
-                                            <View style={AppStyles.ResultCell23}><Text style={AppStyles.ResultCellText}>{result.director}</Text></View>
-                                        </View>
-                                    )
-                                }
-                            </View>
+                        <View style={AppStyles.ResultsContainer}>
+                            {
+                                results.map(result =>
+                                    <Link to={`/movie/${result.id}`}>
+                                        <Image source={{ uri: `https://image.tmdb.org/t/p/original${result.posterPath}` }} style={AppStyles.Poster} />
+                                    </Link>
+                                )
+                            }
                         </View>
                         <View style={AppStyles.HorizontalDivCenterDown}>
                             <Button title="prev" onPress={prevPage} />
@@ -183,15 +170,7 @@ const Home = () => {
                         <View></View>
                         :
                         <View style={AppStyles.ResultContainerDiv}>
-                            <View style={AppStyles.ResultTable}>
-                                <View style={AppStyles.ResultBody}>
-                                    <View style={AppStyles.ResultRow} >
-                                        <View style={AppStyles.ResultCell1} >
-                                            <Text style={AppStyles.ResultCellTextCentered}>No results</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                            <Text>No results</Text>         
                         </View>
 
             }
