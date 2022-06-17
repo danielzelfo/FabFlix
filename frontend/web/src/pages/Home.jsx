@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
     const field_names = ["title", "year", "director", "genre", "limit", "page", "orderBy", "direction"];
-    const default_field_values = ["", "", "", "", "10", "1", "title", "ASC"]
+    const default_field_values = ["", "", "", "", "10", "1", "title", "ASC"];
 
     const navigate = useNavigate();
 
@@ -112,7 +112,7 @@ const Home = () => {
         let page = getValues("page");
         if (page !== undefined) {
             let ipage = parseInt(page)
-            if ( !isNaN(ipage) && page > 0)
+            if (!isNaN(ipage) && page > 0)
                 submitPageSearch(ipage);
         }
     }
@@ -128,7 +128,7 @@ const Home = () => {
                     <Button title="Search" onPress={handleSubmit(submitSearch)} />
                 </View>
 
-                <View style={arrowAdvanced === "↓" ? {display: "none"} : AppStyles.HorizontalDivCenter}>
+                <View style={arrowAdvanced === "↓" ? { display: "none" } : AppStyles.HorizontalDivCenter}>
                     <Controller name="year" control={control} render={({ field: { value, onChange } }) => (
                         <TextInput style={AppStyles.CustomInput} placeholder="year" onChangeText={onChange} value={value || ""} />
                     )} />
@@ -163,7 +163,7 @@ const Home = () => {
                     )} />
                 </View>
 
-                <Text onClick={showAdvancedSearch} style={{cursor: "pointer"}}>{arrowAdvanced === "↓" ? "↓ advanced search ↓" : "↑ basic search ↑"}</Text>
+                <Text onClick={showAdvancedSearch} style={{ cursor: "pointer" }}>{arrowAdvanced === "↓" ? "↓ advanced search ↓" : "↑ basic search ↑"}</Text>
 
             </View>
 
@@ -180,15 +180,15 @@ const Home = () => {
                             }
                         </View>
                         <View style={AppStyles.HorizontalDivCenterDown}>
-                            <View style={{justifyContent: "end"}}><Button title="prev" onPress={prevPage} /></View>
+                            <View style={{ justifyContent: "end" }}><Button title="prev" onPress={prevPage} /></View>
                             <View style={AppStyles.VerticalDiv}>
                                 <Text>Page</Text>
                                 <Controller name="page" control={control} render={({ field: { value, onChange } }) => (
                                     <TextInput style={AppStyles.CustomInputNum} placeholder="1" onChangeText={onChange} value={value || ""} />
                                 )} />
-                                <Button title="go" onPress={searchPage}/>
+                                <Button title="go" onPress={searchPage} />
                             </View>
-                            <View style={{justifyContent: "end"}}><Button title="next" onPress={nextPage} /></View>
+                            <View style={{ justifyContent: "end" }}><Button title="next" onPress={nextPage} /></View>
                         </View>
                     </View>
                     :
@@ -197,7 +197,7 @@ const Home = () => {
                         <View></View>
                         :
                         <View style={AppStyles.ResultContainerDiv}>
-                            <Text>No results</Text>         
+                            <Text>No results</Text>
                         </View>
 
             }

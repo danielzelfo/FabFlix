@@ -231,7 +231,6 @@ public class MovieRepo
 
         String jsonArrayString = "";
         try {
-            System.out.println(sql);
             jsonArrayString = this.template.queryForObject(sql, source, (rs, rowNum)->rs.getString(1));
         } catch (EmptyResultDataAccessException exc ) {
             //this shouldn't happen
