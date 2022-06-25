@@ -31,6 +31,7 @@ A developer account from Stripe is required to get stripe api keys.
 Set the `STRIPE_API_KEY` environment variable to `Secret key` from developer info in the Stripe Developer Dashboard.
 
 
+
 ## Application
 
 Our application depends on a lot of files and resources to be able to run correctly. These files have been provided for you and are listed here for your reference. These files should **NEVER** be modified and must be left **AS IS**.
@@ -62,6 +63,8 @@ There is a Single class that contain all of our test cases:
  - [BillingServiceTest](src/test/java/com/github/klefstad_teaching/cs122b/billing/BillingServiceTest.java)
 
 ## Database
+
+Set the `DB_USERNAME` and `DB_PASSWORD` environment variables to the MySQL database credentials.
 
 ### Schemas
 

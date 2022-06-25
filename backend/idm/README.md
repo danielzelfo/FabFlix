@@ -19,6 +19,8 @@ Spring Boot can has a large number of settings that can be set with a file calle
 
 ## Database
 
+Set the `DB_USERNAME` and `DB_PASSWORD` environment variables to the MySQL database credentials.
+
 ### Schemas
 
 <table>

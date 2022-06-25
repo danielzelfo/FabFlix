@@ -51,6 +51,8 @@ There is a Single class that contain all of our test cases:
 
 ## Database
 
+Set the `DB_USERNAME` and `DB_PASSWORD` environment variables to the MySQL database credentials.
+
 ### Schemas
 
 <table>

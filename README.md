@@ -16,3 +16,9 @@ The design uses an [API gateway](/backend/gateway/) that authenticates customers
 
 ## Frontend
 The frontend includes a [web app](/frontend/web/) built with the [React](https://reactjs.org/) library in JavaScript which enables the single-page design and a [mobile app](/frontend/native/) built with the [React Native](https://reactnative.dev) library in JavaScript.
+
+Checkout these demos:
+
+- [Web App](https://www.youtube.com/watch?v=LdGi30Qjqbo)
+
+- [Android App](https://www.youtube.com/watch?v=OHcX4HqyIjE)
