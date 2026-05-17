@@ -26,10 +26,6 @@ FabFlix is a web-based e-commerce system that allows customers to search for and
 - Web App built with React
 - Mobile App built with React Native
 
-Check out our demos for a preview of the user experience:
-- [Web App](https://www.youtube.com/watch?v=LdGi30Qjqbo)
-- [Android App](https://www.youtube.com/watch?v=OHcX4HqyIjE)
-
 ## Getting Started
 
 To get started with FabFlix, please refer to the appropriate directory under [backend](/backend/) and [frontend](/frontend/) to view the README files for specific instructions on how to run and use the system.
